@@ -11,6 +11,8 @@ public class TestMain {
         System.out.println("메뉴를 입력하세요");
         System.out.print("1)방문 2)예약 3)종료 : ");
         String menu = scan.next();
+        currentTime.setMenuNum(Integer.parseInt(menu));
+        currentTime.setting1();
         switch (menu)
         {
             case "1":
