@@ -15,6 +15,11 @@ public class CurrentTime {
         createtxt();
     }
 
+    public String getDateTime() {
+        //메인함수로 date_time을 반환하는 get함수
+        return date_time;
+    }
+
     public void setMenuNum(int menuNum){
         this.menuNum = menuNum;
     }
