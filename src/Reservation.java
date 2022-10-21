@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.text.NumberFormat;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -119,7 +116,7 @@ public class Reservation {
                 System.out.println("예약 불가능한 자리입니다.");
                 continue;
             }
-            reservationArea = chars.toString();
+            reservationArea = chars[0] + "-" + chars[1] + "-" + chars[2];
             flag = false;
             System.out.println("예약 구역 선택이 완료되었습니다.");
         }
@@ -158,6 +155,24 @@ public class Reservation {
 
     private void reservationCompleted() {//txt에 저장
 
+
+        String[] split = currentTime.split("/");
+        String date = split[0];
+        int menu = 1;
+        File dir = new File(split[0]);
+        if(dir.exists())
+        {
+            try{
+                FileOutputStream fVisited= new FileOutputStream(split[0] + "/booked.txt",true);
+                String fullString = reservationArea + " " + carNum + " " + currentTime +"\n";
+                fVisited.write(fullString.getBytes());
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+
     }
 
     private boolean isAlreadyReserved() {
@@ -173,7 +188,6 @@ public class Reservation {
             readFile = new FileReader(split[0] + "/booked.txt");
 
             BufferedReader br = new BufferedReader(readFile);
-            br.readLine(); //txt파일의 첫 번째 줄은 날짜와 시간이니까 먼저 처리하기
             while((getLine = br.readLine()) != null) {
                 //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작
                 String[] txtSplit = getLine.split(" "); //공백으로 구분
