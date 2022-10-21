@@ -135,15 +135,6 @@ public class CurrentTime {
             try{
                 visit.createNewFile();
                 reservation.createNewFile();
-                FileOutputStream fVisited= new FileOutputStream(split[0] + "/visited.txt",true);
-                fVisited.write(date_time.getBytes());
-                fVisited.close();
-
-                FileOutputStream fBooked= new FileOutputStream(split[0] + "/booked.txt",true);
-                fBooked.write(date_time.getBytes());
-                fBooked.close();
-
-
             }catch(IOException e){
                 e.printStackTrace();
             }

@@ -6,11 +6,13 @@ import java.io.*;
 
 public class Visit {
 
+    private String parkingArea = "";
     Scanner scan = new Scanner(System.in);
     private String carNum;
     private String carArea;
     private String currentTime;
-
+    private boolean[][] parkA = new boolean[4][4];
+    private boolean[][] parkB = new boolean[4][4];
     public Visit(String currentTime) {
         this.currentTime = currentTime;
     }
@@ -86,7 +88,7 @@ public class Visit {
             readFile = new FileReader(split[0] + "/visited.txt");
 
             BufferedReader br = new BufferedReader(readFile);
-            br.readLine(); //txt파일의 첫 번째 줄은 날짜와 시간이니까 먼저 처리하기
+
             while((getLine = br.readLine()) != null) {
                 //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작
                 String[] txtSplit = getLine.split(" "); //공백으로 구분
@@ -119,7 +121,7 @@ public class Visit {
         System.out.println("차량 번호 확인이 완료되었습니다. 예약 고객 확인 단계로 넘어갑니다.");
 
         //2. 예약 고객인지 확인
-        if(isReserved())
+        if(false/*isReserved()*/)
         {//예약 고객
             if(!isReservedSeatFull())//예약자리가 비어있음
             {
@@ -144,6 +146,81 @@ public class Visit {
     }
 
     private void enterParkingSeat() { //올바르게 입력 할때까지 무한루프
+        boolean A = true;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                A = A && parkA[i][j];
+            }
+        }
+        boolean B = true;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                B = B && parkB[i][j];
+            }
+        }
+        if(A && B) //parkA와 parkB에 모두 더이상 주차할 자리가 없는 경우
+        {
+            System.out.println("자리가 모두 꽉차 예약할 수 없습니다.");
+            System.exit(0);
+        }
+
+        boolean flag = true;
+        while(flag)
+        {
+            System.out.print("주차할 자리를 선택하세요 : ");
+            Scanner scan = new Scanner(System.in);
+            String area = scan.next();
+            String[] split = area.split("-");
+            if(area.charAt(area.length()-1) == '-')
+            {
+                System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
+                continue;
+            }
+            if(split.length != 3)
+            {
+                System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
+                continue;
+            }
+            char[]  chars = new char[3];
+            boolean tooLong = false;
+            for (int i = 0; i < 3; i++) {
+                if(split[i].length()>1) // AA, 1.2 같이 각 구분자 사이 길이 2 이상이면 짜름
+                {
+                    System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
+                    tooLong = true;
+                    break;
+                }
+                chars[i] = split[i].charAt(0);
+            }
+            if(tooLong)
+            {
+                continue;
+            }
+            if(chars[0] != 'A' && chars[0] != 'B') //첫번째 문자
+            {
+                System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
+                continue;
+            }
+            if(chars[1] <48 || chars[1] >=52 || chars[2] <48 || chars[2] >=52) // 두 세번째 숫자
+            {
+                System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
+                continue;
+            }
+
+            if(chars[0] == 'A' && parkA[chars[1] - '0'][chars[2] -'0']) //parkA에서 차가 이미 들어가 있는지 확인
+            {
+                System.out.println("예약 불가능한 자리입니다.");
+                continue;
+            }
+            else if(chars[0] == 'B' && parkB[chars[1] - '0'][chars[2] -'0'])  //parkA에서 차가 이미 들어가 있는지 확인
+            {
+                System.out.println("예약 불가능한 자리입니다.");
+                continue;
+            }
+            parkingArea = chars[0] + "-" + chars[1] + "-" + chars[2];
+            flag = false;
+            System.out.println("예약 구역 선택이 완료되었습니다.");
+        }
     }
 
     private void printParkingStatus() {
@@ -159,6 +236,23 @@ public class Visit {
     }
 
     private void entryCompleted() {
+
+        String[] split = currentTime.split("/");
+        String date = split[0];
+        int menu = 1;
+        File dir = new File(split[0]);
+        if(dir.exists())
+        {
+            try{
+                FileOutputStream fVisited= new FileOutputStream(split[0] + "/visited.txt",true);
+                String fullString = parkingArea + " " + carNum + " " + currentTime +"\n";
+                fVisited.write(fullString.getBytes());
+            }catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
     }
 
 
