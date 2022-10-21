@@ -50,6 +50,12 @@ public class Reservation {
             Scanner scan = new Scanner(System.in);
             String area = scan.next();
             String[] split = area.split("-");
+
+            if(area.charAt(area.length()-1) == '-')
+            {
+                System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
+                continue;
+            }
             if (split.length != 3) {
                 System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
                 continue;
