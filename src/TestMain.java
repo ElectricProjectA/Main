@@ -17,7 +17,8 @@ public class TestMain {
                 //방문()
                 break;
             case "2":
-                //예약()
+                Reservation reserve = new Reservation(" ");
+                reserve.reservation();
                 break;
             case "3":
                 //종료()
