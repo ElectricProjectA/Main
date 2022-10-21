@@ -1,3 +1,5 @@
+package Test;
+
 import java.util.Scanner;
 
 public class ReservationAreaTest {
@@ -66,8 +68,19 @@ public class ReservationAreaTest {
                 continue;
             }
             char[]  chars = new char[3];
+            boolean tooLong = false;
             for (int i = 0; i < 3; i++) {
+                if(split[i].length()>1) // AA, 1.2 같이 각 구분자 사이 길이 2 이상이면 짜름
+                {
+                    System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
+                    tooLong = true;
+                    break;
+                }
                 chars[i] = split[i].charAt(0);
+            }
+            if(tooLong)
+            {
+                continue;
             }
             if(chars[0] != 'A' && chars[0] != 'B') //첫번째 문자
             {
@@ -77,16 +90,17 @@ public class ReservationAreaTest {
 
             if(chars[1] <48 || chars[1] >=52 || chars[2] <48 || chars[2] >=52) // 두 세번째 숫자
             {
+
                 System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
                 continue;
             }
 
-            if(chars[0] == 'A' && !parkA[chars[1] - '0'][chars[2] -'0'])
+            if(chars[0] == 'A' && !parkA[chars[1] - '0'][chars[2] -'0']) //parkA에서 차가 이미 들어가 있는지 확인
             {
                 System.out.println("예약 불가능한 자리입니다.");
                 continue;
             }
-            else if(chars[0] == 'B' && !parkA[chars[1] - '0'][chars[2] -'0'])
+            else if(chars[0] == 'B' && !parkA[chars[1] - '0'][chars[2] -'0'])  //parkA에서 차가 이미 들어가 있는지 확인
             {
                 System.out.println("예약 불가능한 자리입니다.");
                 continue;
