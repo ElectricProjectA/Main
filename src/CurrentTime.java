@@ -133,9 +133,12 @@ public class CurrentTime {
                 }
             }
 
+            // input3 = hour
             if(input3 < 8){
+                System.out.println("영업시간은 08시부터입니다.");
                 continue;
             }else if(input3 > 21){
+                System.out.println("영업시간은 22시까지입니다.");
                 continue;
             }
 
@@ -232,11 +235,15 @@ public class CurrentTime {
 
                     out.println(thisLine);
                     k++;
-                }
+                } // while 구문 끝
+
+
                 if(pastFlag)
                     continue;
+
                 if(thisLine == null && k ==0)
                     out.println(date_time);
+
                 out.flush();
                 out.close();
                 in.close();

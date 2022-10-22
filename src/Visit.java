@@ -8,7 +8,7 @@ public class Visit {
 
     private String parkingArea = "";
     Scanner scan = new Scanner(System.in);
-    private String carNum;
+    private String carNum; // for license plate number
     private String carArea;
     private String currentTime;
     private boolean[][] parkA = new boolean[4][4];
@@ -58,18 +58,19 @@ public class Visit {
             }
 
             String[] pattern = {"\\d{3}", "[가-힣]{1}", "\\d{4}"};
-            boolean flag = true; //입력한 번호판 형식이 틀리면 false로 바뀜
+            boolean isLicensePlateSuitableToForm = true; //입력한 번호판 형식이 틀리면 false로 바뀜
             for(int i = 0; i < 3; i++) {
-                if (!Pattern.matches(pattern[i], carNumPiece[i])) { //입력 형식이 틀린 경우
-                    flag = false;
+                if (!Pattern.matches(pattern[i], carNumPiece[i])) {
+                    //입력 형식이 틀린 경우
+                    isLicensePlateSuitableToForm = false;
                     break;
                 }
             }
-            if(!flag) { //입력한 번호판 형식이 틀림
+            if(!isLicensePlateSuitableToForm) {
+                //입력한 번호판 형식이 틀림
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
-            }
-            else {
+            } else {
                 System.out.println("입력이 완료되었습니다.");
                 break;
             }
@@ -80,7 +81,7 @@ public class Visit {
     private boolean isCarExist() {
         String[] split = currentTime.split("/");
         //currentTime: 생상자로 받아온 현재 날짜와 시각
-        //(입력 예시: 2022-9-28/14:00)
+        // 입력 예시: 2022-9-28/14:00
 
         StringBuffer sb = new StringBuffer();
         FileReader readFile;
@@ -109,45 +110,47 @@ public class Visit {
     }
     //carIn && carOut 공통 구역 끝 =========================
 
+
     // carIN 구역 =====================================
-    public void carIn(){ //입차
+    public void carIn(){
+        //입차
 
         //1. 차량번호 입력 및 그 차량이 주차장에 존재하는지 확인
         boolean flag = false;
         while(!flag)
         {
             flag = inputCarNum() && isCarExist();
-            if(!flag)
+            if(!flag) {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요");
+            }
         }
-        System.out.println("차량 번호 확인이 완료되었습니다. 예약 고객 확인 단계로 넘어갑니다.");
+        System.out.println("차량 번호 확인이 완료되었습니다. 예약 여 확인 단계로 넘어갑니다.");
 
         //2. 예약 고객인지 확인
-        if(false/*isReserved()*/)
-        {//예약 고객
-            if(!isReservedSeatFull())//예약자리가 비어있음
-            {
+        if(isReserved()) {
+            //예약 고객
+            if(!isReservedSeatFull()) {
+                //예약자리가 비어있음
                 entryCompleted();
             }
-            else//예약자리가 차있음
-            {
-                if(noEmptySeats())
-                {//빈자리가 아예 없음
+            else {
+                //예약자리가 차있음
+                if(noEmptySeats()) {
+                    //빈자리가 아예 없음
                     forcedExit();
                 }
                 entryCompleted(); //이게 txt 넣는 곳
             }
-
-        }
-        else
-        {//미예약 고객
+        } else {
+            //미예약 고객
             printParkingStatus();
             enterParkingSeat();
             entryCompleted();//이게 txt 넣는 곳
         }
     }
 
-    private void enterParkingSeat() { //올바르게 입력 할때까지 무한루프
+    private void enterParkingSeat() {
+        //올바르게 입력 할때까지 무한루프
         boolean A = true;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
@@ -160,15 +163,14 @@ public class Visit {
                 B = B && parkB[i][j];
             }
         }
-        if(A && B) //parkA와 parkB에 모두 더이상 주차할 자리가 없는 경우
-        {
+        if(A && B) {
+            //parkA와 parkB에 모두 더이상 주차할 자리가 없는 경우
             System.out.println("자리가 모두 꽉차 예약할 수 없습니다.");
             System.exit(0);
         }
 
         boolean flag = true;
-        while(flag)
-        {
+        while(flag) {
             System.out.print("주차할 자리를 선택하세요 : ");
             Scanner scan = new Scanner(System.in);
             String area = scan.next();
@@ -226,8 +228,8 @@ public class Visit {
     }
 
     private void printParkingStatus() {
-        //예약에서 활용ㅅ
-        //asdf
+        //예약에서 활용
+        System.out.println("Printing parking status...");
     }
 
     private void forcedExit() {
@@ -265,11 +267,10 @@ public class Visit {
     }
 
     private boolean isReserved(){
-
-        return true;
+        System.out.println("Checking if the spot is reserved");
+        System.out.println("test default is false");
+        return false;
     }
-
-
 
     // carIn 구역 끝==========================================
 
