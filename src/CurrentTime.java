@@ -123,6 +123,14 @@ public class CurrentTime {
             //--현재 타임 로그 저장---
             File timeLog = new File("timeLog.txt");
             try{
+                if(!timeLog.exists())
+                    timeLog.createNewFile();
+            }catch (Exception e)
+            {
+                e.getStackTrace();
+            }
+
+            try{
 
                 String log = "\n" +date_time;
                 //파일에서 읽은 한라인을 저장하는 임시변수
@@ -137,6 +145,7 @@ public class CurrentTime {
                 PrintWriter out = new PrintWriter(fout);
                 //파일 내용을 한라인씩 읽어 삽입될 라인이 오면 문자열을 삽입
                 int k =0;
+                boolean pastFlag = false;
                 while ((thisLine = in.readLine()) != null) {
                     //"2020-10-03/14:01"
                     if(k==0)
@@ -153,14 +162,19 @@ public class CurrentTime {
                         }
                         if(flag)
                             out.println(date_time);
-                        else
-                            System.out.println("실패");
+                        else {
+                            System.out.println("기록된 현재 시간보다 더 이전 시간을 입력하실 수 없습니다.");
+                            pastFlag = true;
+                            break;
+                        }
                     }
 
                     out.println(thisLine);
                     k++;
                 }
-                if(thisLine == null)
+                if(pastFlag)
+                    continue;
+                if(thisLine == null && k ==0)
                     out.println(date_time);
                 out.flush();
                 out.close();
