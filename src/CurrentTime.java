@@ -35,7 +35,7 @@ public class CurrentTime {
         Scanner scanner = new Scanner(System.in);
 
         while(true){
-            System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시: 2022-9-28/14:00) ");
+            System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시:2022-9-28/14:00) ");
             System.out.print(":");
             date_time = scanner.next();
 
@@ -44,6 +44,27 @@ public class CurrentTime {
             int slashNum = date_time.length() - date_time.replace("/","").length();
             int twodotNum = date_time.length() - date_time.replace(":","").length();
             String[] input = date_time.split("-|/|:");
+
+            // date_time 0 붙는지 안붙는지 확인후 붙이기 - 테스트용.
+            for(int i=0; i<input.length; i++) {
+                if(Integer.parseInt(input[i]) < 10) {
+                    String stringStartsWithZero = "0";
+                    stringStartsWithZero = stringStartsWithZero + input[i];
+                    System.out.println("temp: "+stringStartsWithZero);
+                    input[i] = stringStartsWithZero;
+                }
+            }
+            // date_time 형식을 2022-9-6/8:3 에서 2022-09-06/08:03으로 바꿔줌
+            date_time = input[0]+"-"+input[1]+"-"+input[2]+"/"+input[3]+":"+input[4];
+            // 검사용
+            System.out.println("Test:"+date_time);
+
+            /* date_time 형식수정 확인용 검
+            for(int i=0; i<input.length; i++) {
+                System.out.println(input[i]);
+            }
+            */
+
 
             if(input.length != 5){
                 continue;
@@ -150,11 +171,12 @@ public class CurrentTime {
                     //"2020-10-03/14:01"
                     if(k==0)
                     {
+                        System.out.println("***Test***");
                         String[] split1 = thisLine.split("-|/|:");
                         String[] split2 = date_time.split("-|/|:");
                         boolean flag = true;
                         for (int i = 0; i < split1.length; i++) {
-                            if(Integer.parseInt(split2[i]) <Integer.parseInt(split1[i]))
+                            if(Integer.parseInt(split2[i]) < Integer.parseInt(split1[i]))
                             {
                                 flag = false;
                                 break;

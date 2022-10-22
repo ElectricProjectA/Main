@@ -46,7 +46,8 @@ public class Visit {
     //carIn && carOut 공통 구역 =========================
     private boolean inputCarNum(){
         while(true) { //올바른 형식을 입력할 때까지 while문 무한반복
-            System.out.print("차량 번호를 입력하세요: ");
+            System.out.println("차량 번호를 입력하세요 ex)123-가-1234");
+            System.out.print(">>>");
             carNum = scan.next();
             int hyphenNum = carNum.length() - carNum.replace("-","").length();
             String[] carNumPiece = carNum.split("-");
