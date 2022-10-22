@@ -12,7 +12,6 @@ public class CurrentTime {
     }
 
     public void setting() {
-
         enterCurrentTime();
         createtxt();
     }
@@ -37,6 +36,7 @@ public class CurrentTime {
 
         while(true){
             System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시: 2022-9-28/14:00) ");
+            System.out.print(":");
             date_time = scanner.next();
 
             //구분자 개수 찾기
@@ -130,7 +130,7 @@ public class CurrentTime {
                 e.getStackTrace();
             }
 
-            try{
+            try {
 
                 String log = "\n" +date_time;
                 //파일에서 읽은 한라인을 저장하는 임시변수
@@ -183,8 +183,7 @@ public class CurrentTime {
                 //임시파일을 원래 파일명으로 변경
                 tmpFile.renameTo(timeLog);
 
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.getStackTrace();
             }
             break;
