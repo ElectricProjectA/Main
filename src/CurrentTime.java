@@ -253,6 +253,7 @@ public class CurrentTime {
 
             } catch (Exception e) {
                 e.getStackTrace();
+                System.out.println("오류입나다.");
             }
             break;
         }
