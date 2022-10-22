@@ -36,7 +36,7 @@ public class CurrentTime {
 
         while(true){
             System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시:2022-9-28/14:00) ");
-            System.out.print(":");
+            System.out.print(">>>");
             date_time = scanner.next();
 
             //구분자 개수 찾기

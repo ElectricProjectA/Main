@@ -23,7 +23,8 @@ public class Visit {
             System.out.println("주차장 운영 시간이 아닙니다.");
             return;
         }
-        System.out.print("1)입차 2)출차: ");
+        System.out.println("1)입차 2)출차");
+        System.out.print(">>>");
         int menu = scan.nextInt();
 
         switch (menu){
