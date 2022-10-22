@@ -12,7 +12,6 @@ public class CurrentTime {
     }
 
     public void setting() {
-
         enterCurrentTime();
         createtxt();
     }
@@ -36,7 +35,8 @@ public class CurrentTime {
         Scanner scanner = new Scanner(System.in);
 
         while(true){
-            System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시: 2022-9-28/14:00) ");
+            System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시:2022-9-28/14:00) ");
+            System.out.print(">>>");
             date_time = scanner.next();
 
             //구분자 개수 찾기
@@ -44,6 +44,32 @@ public class CurrentTime {
             int slashNum = date_time.length() - date_time.replace("/","").length();
             int twodotNum = date_time.length() - date_time.replace(":","").length();
             String[] input = date_time.split("-|/|:");
+
+
+            // date_time 0 붙는지 안붙는지 확인후 붙이기 - 테스트용.
+            /*
+            for(int i=0; i<input.length; i++) {
+                String stringStartsWithZero = "0";
+                if(input[i].length() < 2) {
+                    stringStartsWithZero = stringStartsWithZero + input[i];
+                    System.out.println("temp: "+stringStartsWithZero);
+                    input[i] = stringStartsWithZero;
+                }
+            }
+            // date_timeforComparison 형식을 2022-9-6/8:3 에서 2022-09-06/08:03으로 바꿔줌
+            String date_timeforComparison = "";
+            date_timeforComparison = input[0]+"-"+input[1]+"-"+input[2]+"/"+input[3]+":"+input[4];
+            // 검사
+            System.out.println("Test:"+date_timeforComparison);
+            */
+
+            /* date_time 형식수정 확인용 test
+            for(int i=0; i<input.length; i++) {
+                System.out.println(input[i]);
+            }
+            */
+
+
 
             if(input.length != 5){
                 continue;
@@ -107,9 +133,12 @@ public class CurrentTime {
                 }
             }
 
+            // input3 = hour
             if(input3 < 8){
+                System.out.println("영업시간은 08시부터입니다.");
                 continue;
             }else if(input3 > 21){
+                System.out.println("영업시간은 22시까지입니다.");
                 continue;
             }
 
@@ -130,7 +159,7 @@ public class CurrentTime {
                 e.getStackTrace();
             }
 
-            try{
+            try {
 
                 String log = "\n" +date_time;
                 //파일에서 읽은 한라인을 저장하는 임시변수
@@ -150,19 +179,54 @@ public class CurrentTime {
                     //"2020-10-03/14:01"
                     if(k==0)
                     {
+                        System.out.println("***Test***");
                         String[] split1 = thisLine.split("-|/|:");
                         String[] split2 = date_time.split("-|/|:");
                         boolean flag = true;
-                        for (int i = 0; i < split1.length; i++) {
-                            if(Integer.parseInt(split2[i]) <Integer.parseInt(split1[i]))
-                            {
+
+                        if((Integer.parseInt(split2[0]) < Integer.parseInt(split1[0]))) {
+                            System.out.println("기록된 year 보다 과거입니다");
+                            flag = false;
+                        } else if ((Integer.parseInt(split2[0]) > Integer.parseInt(split1[0]))) {
+                            // 기록시간 이후의 입력 따라서 flag = true
+                        } else {
+                            // when years are the same
+                            if((Integer.parseInt(split2[1]) < Integer.parseInt(split1[1]))) {
+                                System.out.println("기록된 month 보다 과거입니다");
                                 flag = false;
-                                break;
+                            } else if ((Integer.parseInt(split2[1]) > Integer.parseInt(split1[1]))) {
+                                // 기록시간 이후의 입력 따라서 flag = true
+                            } else {
+                                // when years and months are the same
+                                if((Integer.parseInt(split2[2]) < Integer.parseInt(split1[2]))) {
+                                    System.out.println("기록된 date 보다 과거입니다");
+                                    flag = false;
+                                } else if ((Integer.parseInt(split2[2]) > Integer.parseInt(split1[2]))) {
+                                    // 기록시간 이후의 입력 따라서 flag = true
+                                } else {
+                                    // when years, months and dates are the same
+                                    if((Integer.parseInt(split2[3]) < Integer.parseInt(split1[3]))) {
+                                        System.out.println("기록된 time 보다 과거입니다");
+                                        flag = false;
+                                    } else if ((Integer.parseInt(split2[3]) > Integer.parseInt(split1[3]))) {
+                                        // 기록시간 이후의 입력 따라서 flag = true
+                                    } else {
+                                        // when years, months, dates and times are the same
+                                        if((Integer.parseInt(split2[4]) < Integer.parseInt(split1[4]))) {
+                                            System.out.println("기록된 time 보다 과거입니다");
+                                            flag = false;
+                                        } else if ((Integer.parseInt(split2[4]) >= Integer.parseInt(split1[4]))) {
+                                            // 기록시간 이후의 입력 따라서 flag = true
+                                            // 분까지는 이후가 아니고 같다고 된다고 해놨음.
+                                        }
+                                    }
+                                }
                             }
                         }
-                        if(flag)
+
+                        if(flag) {
                             out.println(date_time);
-                        else {
+                        } else {
                             System.out.println("기록된 현재 시간보다 더 이전 시간을 입력하실 수 없습니다.");
                             pastFlag = true;
                             break;
@@ -171,11 +235,15 @@ public class CurrentTime {
 
                     out.println(thisLine);
                     k++;
-                }
+                } // while 구문 끝
+
+
                 if(pastFlag)
                     continue;
+
                 if(thisLine == null && k ==0)
                     out.println(date_time);
+
                 out.flush();
                 out.close();
                 in.close();
@@ -183,8 +251,7 @@ public class CurrentTime {
                 //임시파일을 원래 파일명으로 변경
                 tmpFile.renameTo(timeLog);
 
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.getStackTrace();
             }
             break;

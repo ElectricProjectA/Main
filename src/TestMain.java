@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class TestMain {
     public static void main(String[] args) {
 
-        System.out.println("주차관리 시스템에 오신 걸 환영합니다.");관
+        System.out.println("주차관리 시스템에 오신 걸 환영합니다.");
         CurrentTime currentTime = new CurrentTime();
         currentTime.setting();
         String date_time = currentTime.getDateTime();
@@ -14,8 +14,7 @@ public class TestMain {
         String menu = scan.next();
         currentTime.setMenuNum(Integer.parseInt(menu));
         currentTime.setting1();
-        switch (menu)
-        {
+        switch (menu) {
             case "1":
                 //방문()
                 Visit visit = new Visit(date_time);
@@ -29,6 +28,5 @@ public class TestMain {
                 //종료()
                 break;
         }
-
     }
 }
