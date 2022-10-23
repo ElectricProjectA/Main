@@ -33,7 +33,7 @@ public class Visit {
         }
         System.out.println("1)입차 2)출차");
         System.out.print(">>>");
-        int menu = scan.nextInt();
+        int menu = scan.nextInt(); // 예외처리 필
 
         switch (menu){
             case 1:
@@ -149,9 +149,9 @@ public class Visit {
         }
         System.out.println("차량 번호 확인이 완료되었습니다. 예약 여부 확인 단계로 넘어갑니다.");
 
-        //2. 예약 고객인지 확인
+        //2. 예약 고객인지 확인- 재원 part
         if(isReserved()) {
-            //예약 고객
+            // when user have reserved
             if(!isReservedSeatFull()) {
                 //예약자리가 비어있음
                 entryCompleted();
@@ -194,7 +194,8 @@ public class Visit {
 
         boolean flag = true;
         while(flag) {
-            System.out.print("주차할 자리를 선택하세요 (");
+            System.out.println("주차할 자리를 선택하세요 ex)A-1-3");
+            System.out.print(">>>");
             Scanner scan = new Scanner(System.in);
             String area = scan.next();
             String[] split = area.split("-");
@@ -246,7 +247,7 @@ public class Visit {
             }
             parkingArea = chars[0] + "-" + chars[1] + "-" + chars[2];
             flag = false;
-            System.out.println("예약 구역 선택이 완료되었습니다.");
+            System.out.println("입차가 완료되었습니다.");
         }
     }
 
@@ -351,11 +352,53 @@ public class Visit {
         return true;
     }
 
-    private boolean isReserved(){
+    private boolean isReserved() {
+        System.out.println("Checking if you've made a reservation...");
 
-        System.out.println("Checking if you've made a reservation");
-        System.out.println("test default is false");
-        return false;
+        boolean isCarReserved = false;
+
+        String[] splitCurrentTimeforReserveCheck = currentTime.split("/");
+        //currentTime: 생상자로 받아온 현재 날짜와 시각
+        // 입력 예시: 2022-9-28/14:00
+
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+
+        String[] input = currentTime.split("-|/|:");
+        for (int i = 0; i < input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
+        }
+
+        input0 = (int) Double.parseDouble(input[0]);
+        input1 = (int) Double.parseDouble(input[1]);
+        input2 = (int) Double.parseDouble(input[2]);
+        input3 = (int) Double.parseDouble(input[3]);
+        input4 = (int) Double.parseDouble(input[4]);
+
+        clearDateTime = input0 + "-" + input1 + "-" + input2 + "/" + input3 + ":" + input4;
+        pathname = input0 + "-" + input1 + "-" + input2;
+        try {
+            readFile = new FileReader(pathname + "/booked.txt");
+
+            BufferedReader brforReserveCheck = new BufferedReader(readFile);
+
+            while ((getLine = brforReserveCheck.readLine()) != null) {
+                //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작
+                String[] txtSplit = getLine.split(" "); //공백으로 구분
+                if (txtSplit[1].contains(carNum)) {
+                    System.out.println(carNum + "차량은 현재 예약되어있는 차량입니다.");
+                    isCarReserved = true; // returns true if the car has reserved
+                }
+            }
+            brforReserveCheck.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("isCarReserved: "+isCarReserved);
+        return isCarReserved;
     }
 
     // carIn 구역 끝==========================================
