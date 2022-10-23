@@ -503,7 +503,12 @@ public class Reservation {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
+            if(Integer.parseInt(currentTime[0]) == rinput0 )
+            {
+                clearReservationTime = rinput0+"-"+rinput1+"-"+rinput2+"/"+rinput3+":"+rinput4;
+                break;
 
+            }
             if(rinput1==1 || rinput1==3 || rinput1==5 || rinput1==7 || rinput1==8 || rinput1==10 || rinput1==12){
                 if(rinput2<1){
                     System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
