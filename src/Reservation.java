@@ -44,19 +44,23 @@ public class Reservation {
 
 
     }
-    private void enterParkingSeat() { //올바르게 입력 할때까지 무한루프
+    private void enterParkingSeat() {
+        //올바르게 입력 할때까지 무한루프
+
         boolean A = true;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 A = A && parkA[i][j];
             }
         }
+
         boolean B = true;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 B = B && parkB[i][j];
             }
         }
+
         if(A && B) //parkA와 parkB에 모두 더이상 주차할 자리가 없는 경우
         {
             System.out.println("자리가 모두 꽉차 예약할 수 없습니다.");
