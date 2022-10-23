@@ -156,7 +156,7 @@ public class Visit {
         }
         System.out.println("차량 번호 확인이 완료되었습니다. 예약 여부 확인 단계로 넘어갑니다.");
 
-        //2. 예약 고객인지 확인- 재원 part
+        //2. 예약 고객인지 확인
         if(isReservedUser()) {
             // when user have reserved
             if(isReservedSeatOccupied()) {
@@ -167,7 +167,7 @@ public class Visit {
                     entryCompleted();
                 } else {
                     // 먼저 입차한사람 정보를 임시로 저장한 뒤 visited.txt에서 삭제하고
-                    // 예약자를 예약자리에 넣은뒤, if noEmptySeats면 강제출차, 아니면 빈자리 찾아서 입차시켜
+                    // 예약자를 예약자리에 넣은뒤, if noEmptySeats면 강제출차, 아니면 빈자리 찾아서 입차시켜줌
                     String[] occupyingVisiterInfo = occupyingVisiter().split(" ");
                     forceExitVisiter();
                     deleteReservationAfterReservationCheck();
