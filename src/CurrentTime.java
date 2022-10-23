@@ -69,6 +69,24 @@ public class CurrentTime {
             }
             */
 
+            boolean loop=false;
+            outerloop:
+            for(int i=0; i<input.length; i++){
+                input[i]=input[i].replaceFirst("^0+(?!$)", "");
+                for(int j=0; j<input[i].length(); j++){
+                    if((int)input[i].charAt(j) == 46)
+                        continue;
+                    else if((int)input[i].charAt(j) <48 || (int)input[i].charAt(j) >57){
+                        System.out.println("숫자가 아닌 형식이 입력되었습니다.");
+                        loop=true;
+                        break outerloop;
+                    }
+                }
+            }
+            if(loop){
+                continue;
+            }
+
 
 
             if(input.length != 5){
