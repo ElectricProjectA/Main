@@ -487,7 +487,7 @@ public class Reservation {
                             continue;
                         }else {
                             // when years, months, dates and times are the same
-                            if((Integer.parseInt(currentTime[4]) > rinput4)) {
+                            if((Integer.parseInt(currentTime[3]) > rinput3) && (Integer.parseInt(currentTime[4]) > rinput4)) {
                                 System.out.println("기록된 time 보다 과거입니다");
                                 continue;
                             }
@@ -496,6 +496,7 @@ public class Reservation {
                 }
             }
 
+
             if(rinput1 > 12){
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
@@ -503,6 +504,8 @@ public class Reservation {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
+            if(Integer.parseInt(currentTime[0])  == rinput0)
+                break;
 
             if(rinput1==1 || rinput1==3 || rinput1==5 || rinput1==7 || rinput1==8 || rinput1==10 || rinput1==12){
                 if(rinput2<1){
