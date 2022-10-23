@@ -487,7 +487,7 @@ public class Reservation {
                             continue;
                         }else {
                             // when years, months, dates and times are the same
-                            if((Integer.parseInt(currentTime[4]) > rinput4)) {
+                            if((Integer.parseInt(currentTime[3]) > rinput3) && (Integer.parseInt(currentTime[4]) > rinput4)) {
                                 System.out.println("기록된 time 보다 과거입니다");
                                 continue;
                             }
