@@ -80,15 +80,16 @@ public class Visit {
 
     private boolean isCarExist() {
         String[] split = currentTime.split("/");
-        //currentTime: 생상자로 받아온 현재 날짜와 시각
-        // 입력 예시: 2022-9-28/14:00
+        //currentTime: 생상자로 받아온 현재 날짜와 시각 / 입력 예시: 2022-9-28/14:00
 
         StringBuffer sb = new StringBuffer();
         FileReader readFile;
         String getLine;
 
         try {
-            readFile = new FileReader(split[0] + "/visited.txt");
+            String date[] = split[0].split("-");
+            String pathname=date[0].replaceFirst("^0+(?!$)", "")+"-"+date[1].replaceFirst("^0+(?!$)", "")+"-"+date[2].replaceFirst("^0+(?!$)", "");
+            readFile = new FileReader(pathname + "/visited.txt");
 
             BufferedReader br = new BufferedReader(readFile);
 
@@ -100,6 +101,7 @@ public class Visit {
                     return false; //차량이 존재하면 false 반환
                 }
             }
+
             br.close();
         } catch(FileNotFoundException e) {
             e.printStackTrace();
@@ -117,14 +119,13 @@ public class Visit {
 
         //1. 차량번호 입력 및 그 차량이 주차장에 존재하는지 확인
         boolean flag = false;
-        while(!flag)
-        {
+        while(!flag) {
             flag = inputCarNum() && isCarExist();
             if(!flag) {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요");
             }
         }
-        System.out.println("차량 번호 확인이 완료되었습니다. 예약 여 확인 단계로 넘어갑니다.");
+        System.out.println("차량 번호 확인이 완료되었습니다. 예약 여부 확인 단계로 넘어갑니다.");
 
         //2. 예약 고객인지 확인
         if(isReserved()) {
@@ -151,18 +152,21 @@ public class Visit {
 
     private void enterParkingSeat() {
         //올바르게 입력 할때까지 무한루프
+
         boolean A = true;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 A = A && parkA[i][j];
             }
         }
+
         boolean B = true;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 B = B && parkB[i][j];
             }
         }
+
         if(A && B) {
             //parkA와 parkB에 모두 더이상 주차할 자리가 없는 경우
             System.out.println("자리가 모두 꽉차 예약할 수 없습니다.");
@@ -171,7 +175,11 @@ public class Visit {
 
         boolean flag = true;
         while(flag) {
-            System.out.print("주차할 자리를 선택하세요 : ");
+            System.out.println("Parking lot Status");
+
+            System.out.println("주차할 자리를 선택하세요 (ex>>>A-1-3 // A구역 1행의 3열이라는 뜻)");
+            // print parking lot status
+            System.out.print(">>>");
             Scanner scan = new Scanner(System.in);
             String area = scan.next();
             String[] split = area.split("-");
@@ -221,15 +229,56 @@ public class Visit {
                 System.out.println("예약 불가능한 자리입니다.");
                 continue;
             }
+
             parkingArea = chars[0] + "-" + chars[1] + "-" + chars[2];
             flag = false;
-            System.out.println("예약 구역 선택이 완료되었습니다.");
+            System.out.println("입차 구역 선택이 완료되었습니다.");
         }
     }
 
     private void printParkingStatus() {
-        //예약에서 활용
         System.out.println("Printing parking status...");
+        int howManyCarsinA = 0;
+        for(int i=0; i<4; i++) {
+            for (int j=0; j<4; j++) {
+                if(parkA[i][j]) {
+                    howManyCarsinA++;
+                }
+            }
+        }
+        System.out.println("A 구역: "+howManyCarsinA+"/16");
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if(parkA[i][j]) {
+                    System.out.print("■");
+                } else {
+                    System.out.print("□");
+                }
+            }
+            System.out.println();
+        }
+
+        int howManyCarsinB = 0;
+        for(int i=0; i<4; i++) {
+            for (int j=0; j<4; j++) {
+                if(parkB[i][j]) {
+                    howManyCarsinB++;
+                }
+            }
+        }
+        System.out.println("B 구역: "+howManyCarsinB+"/16");
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                if(parkB[i][j]) {
+                    System.out.print("■");
+                } else {
+                    System.out.print("□");
+                }
+            }
+            System.out.println();
+        }
     }
 
     private void forcedExit() {
@@ -267,7 +316,7 @@ public class Visit {
     }
 
     private boolean isReserved(){
-        System.out.println("Checking if the spot is reserved");
+        System.out.println("Checking if you've made a reservation");
         System.out.println("test default is false");
         return false;
     }
