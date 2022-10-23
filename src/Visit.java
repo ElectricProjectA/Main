@@ -33,7 +33,7 @@ public class Visit {
         }
         System.out.println("1)입차 2)출차");
         System.out.print(">>>");
-        int menu = scan.nextInt(); // 예외처리 필
+        int menu = scan.nextInt(); // 예외처리 필요
 
         switch (menu){
             case 1:
@@ -150,19 +150,15 @@ public class Visit {
         System.out.println("차량 번호 확인이 완료되었습니다. 예약 여부 확인 단계로 넘어갑니다.");
 
         //2. 예약 고객인지 확인- 재원 part
-        if(isReserved()) {
+        if(isReservedUser()) {
             // when user have reserved
-            if(!isReservedSeatFull()) {
-                //예약자리가 비어있음
-                entryCompleted();
-            }
-            else {
-                //예약자리가 차있음
+            if(isReservedSeatOccupied()) {
                 if(noEmptySeats()) {
-                    //빈자리가 아예 없음
-                    forcedExit();
+                    forceExitVisiter();
                 }
                 entryCompleted(); //이게 txt 넣는 곳
+            } else {
+                entryCompleted();
             }
         } else {
             //미예약 고객
@@ -318,27 +314,89 @@ public class Visit {
 
     }
 
-    private void forcedExit() {
+    private void forceExitVisiter() {
+        // 기존 그 자리에 예약된걸 출차처리하고 예약자는 입차시킴.
+
     }
 
     private boolean noEmptySeats() {
-        return true;
+        // 주차장 loop 돌리기
+        System.out.println("Checking if there are empty seats...");
+        boolean isParkinglotFull = true;
+
+        String[] input = currentTime.split("-|/|:");
+        for(int i=0; i<input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
+        }
+
+        input0 = (int)Double.parseDouble(input[0]);
+        input1 = (int)Double.parseDouble(input[1]);
+        input2 = (int)Double.parseDouble(input[2]);
+        input3 = (int)Double.parseDouble(input[3]);
+        input4 = (int)Double.parseDouble(input[4]);
+
+        clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+        pathname = input0+"-"+input1+"-"+input2;
+        int countA = 0;
+        int countB =0;
+        try{
+            FileInputStream currentFile = new FileInputStream(pathname + "/visited.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
+            String getLine = "";
+            int k=0;
+            while((getLine = in.readLine()) != null)
+            {
+                String[] fullString = getLine.split(" ");
+                String[] split = fullString[0].split("-");
+                int n1 = Integer.parseInt(split[1]);
+                int n2 = Integer.parseInt(split[2]);
+                if(split[0].equals("A"))
+                {
+                    parkA[n1][n2] = true;
+                    countA++;
+                }
+                else if(split[0].equals("B"))
+                {
+                    parkB[n1][n2] = true;
+                    countB++;
+                }
+                k++;
+            }
+            in.close();
+        } catch (Exception e)
+        {
+            e.getStackTrace();
+        }
+
+        for (int i = 0; i < parkA.length; i++) {
+            for (int j = 0; j < parkA[0].length; j++) {
+                if(!parkA[i][j])
+                    isParkinglotFull = false;
+            }
+        }
+        for (int i = 0; i < parkB.length; i++) {
+            for (int j = 0; j < parkB[0].length; j++) {
+                if(parkB[i][j])
+                    isParkinglotFull = false;
+            }
+        }
+
+        return isParkinglotFull;
     }
 
     private void entryCompleted() {
-
+        System.out.println("Completing the entry...");
         String[] split = clearDateTime.split("/");
         String date = split[0];
         int menu = 1;
         File dir = new File(pathname);
-        if(dir.exists())
+        if (dir.exists())
         {
-            try{
+            try {
                 FileOutputStream fVisited= new FileOutputStream(pathname + "/visited.txt",true);
                 String fullString = parkingArea + " " + carNum + " " + clearDateTime +"\n";
                 fVisited.write(fullString.getBytes());
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -346,13 +404,13 @@ public class Visit {
     }
 
 
-    private boolean isReservedSeatFull()
+    private boolean isReservedSeatOccupied()
     {
-
+        // read visited.txt & 만약 visited에 차량번호가 있으면 true 반환
         return true;
     }
 
-    private boolean isReserved() {
+    private boolean isReservedUser() {
         System.out.println("Checking if you've made a reservation...");
 
         boolean isCarReserved = false;
