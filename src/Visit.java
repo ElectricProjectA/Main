@@ -166,23 +166,33 @@ public class Visit {
                     deleteReservationAfterReservationCheck();
                     entryCompleted();
                 } else {
-                    // 비어있는 자리 찾아서 입차시켜줌.
-                    boolean isFindingEmptySpotOver = false;
-                    while(!isFindingEmptySpotOver){
-                        for(int i=0; i<4; i++) {
-                            for(int j=0; j<4; j++) {
-                                if(!parkA[i][j]){
-                                    // 그 자리에 입차시킴.
-                                    parkingArea = "A-"+i+"-"+j;
-                                    entryCompleted();
-                                    deleteReservationAfterReservationCheck();
-                                    isFindingEmptySpotOver = true;
-                                } else if(!parkB[i][j]) {
-                                    // 그 자리에 입차시킴.
-                                    parkingArea = "B-"+i+"-"+j;
-                                    entryCompleted();
-                                    deleteReservationAfterReservationCheck();
-                                    isFindingEmptySpotOver = true;
+                    // 먼저 입차한사람 정보를 임시로 저장한 뒤 visited.txt에서 삭제하고
+                    // 예약자를 예약자리에 넣은뒤, if noEmptySeats면 강제출차, 아니면 빈자리 찾아서 입차시켜
+                    String[] occupyingVisiterInfo = occupyingVisiter().split(" ");
+                    forceExitVisiter();
+                    deleteReservationAfterReservationCheck();
+                    entryCompleted();
+
+                    if(noEmptySeats()) {
+                        System.out.println("Occupying Visiter has force Exited");
+                    } else {
+                        boolean isFindingEmptySpotOver = false;
+                        while(!isFindingEmptySpotOver){
+                            for(int i=0; i<4; i++) {
+                                for(int j=0; j<4; j++) {
+                                    if(!parkA[i][j]){
+                                        // 그 자리에 입차시킴.
+                                        parkingArea = "A-"+i+"-"+j;
+                                        carNum = occupyingVisiterInfo[1];
+                                        entryCompleted();
+                                        isFindingEmptySpotOver = true;
+                                    } else if(!parkB[i][j]) {
+                                        // 그 자리에 입차시킴.
+                                        parkingArea = "B-"+i+"-"+j;
+                                        carNum = occupyingVisiterInfo[1];
+                                        entryCompleted();
+                                        isFindingEmptySpotOver = true;
+                                    }
                                 }
                             }
                         }
@@ -199,6 +209,37 @@ public class Visit {
             enterParkingSeat();
             entryCompleted();//이게 txt 넣는 곳
         }
+    }
+
+    private String occupyingVisiter() {
+        String occupyingVisiter = "";
+
+        String[] split = currentTime.split("/");
+        System.out.println(split[0]);
+
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+
+        try {
+            readFile = new FileReader(split[0] + "/visited.txt");
+
+            BufferedReader br = new BufferedReader(readFile);
+            while((getLine = br.readLine()) != null) {
+                //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작
+                String[] txtSplit = getLine.split(" "); //공백으로 구분
+                if(txtSplit[0].contains(reservedSpot)) {
+                    occupyingVisiter = getLine; //차량이 존재하면 true 반환
+                }
+            }
+            br.close();
+        } catch(FileNotFoundException e) {
+            e.printStackTrace();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+        return occupyingVisiter;
     }
 
     private boolean isReservedUser() {
@@ -251,18 +292,19 @@ public class Visit {
         return isCarReserved;
     }
 
-    private boolean isReservedSeatOccupied()
-    {
+    private boolean isReservedSeatOccupied() {
         System.out.println("Checking if the spot is occupied...");
         boolean isReservedSeatOccupied = false;
 
-        String[] split = currentTime.split("/");
+       String[] split = currentTime.split("/");
 
         StringBuffer sb = new StringBuffer();
         FileReader readFile;
         String getLine;
 
+
         try {
+            // 사용자가 날짜 입력에 0 포함되어있으면 에러남 - currentTime 변수 0 없애서 저장해주셈.
             readFile = new FileReader(split[0] + "/visited.txt");
 
             BufferedReader br = new BufferedReader(readFile);
