@@ -251,8 +251,70 @@ public class Visit {
     }
 
     private void printParkingStatus() {
-        //예약에서 활용
-        System.out.println("Printing parking status...");
+        String[] input = currentTime.split("-|/|:");
+        for(int i=0; i<input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
+        }
+
+        input0 = (int)Double.parseDouble(input[0]);
+        input1 = (int)Double.parseDouble(input[1]);
+        input2 = (int)Double.parseDouble(input[2]);
+        input3 = (int)Double.parseDouble(input[3]);
+        input4 = (int)Double.parseDouble(input[4]);
+
+        clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+        pathname = input0+"-"+input1+"-"+input2;
+        int countA = 0;
+        int countB =0;
+        try{
+            FileInputStream currentFile = new FileInputStream(pathname + "/visited.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
+            String getLine = "";
+            int k=0;
+            while((getLine = in.readLine()) != null)
+            {
+                String[] fullString = getLine.split(" ");
+                String[] split = fullString[0].split("-");
+                int n1 = Integer.parseInt(split[1]);
+                int n2 = Integer.parseInt(split[2]);
+                if(split[0].equals("A"))
+                {
+                    parkA[n1][n2] = true;
+                    countA++;
+                }
+                else if(split[0].equals("B"))
+                {
+                    parkB[n1][n2] = true;
+                    countB++;
+                }
+                k++;
+            }
+            in.close();
+        }catch (Exception e)
+        {
+            e.getStackTrace();
+        }
+        System.out.println("A구역 : " + countA + "/16");
+        for (int i = 0; i < parkA.length; i++) {
+            for (int j = 0; j < parkA[0].length; j++) {
+                if(parkA[i][j])
+                    System.out.print("■ ");
+                else
+                    System.out.print("□ ");
+            }
+            System.out.println();
+        }
+        System.out.println("B구역 : " + countB + "/16");
+        for (int i = 0; i < parkB.length; i++) {
+            for (int j = 0; j < parkB[0].length; j++) {
+                if(parkB[i][j])
+                    System.out.print("■ ");
+                else
+                    System.out.print("□ ");
+            }
+            System.out.println();
+        }
+
     }
 
     private void forcedExit() {
@@ -290,6 +352,7 @@ public class Visit {
     }
 
     private boolean isReserved(){
+
         System.out.println("Checking if the spot is reserved");
         System.out.println("test default is false");
         return false;
@@ -300,6 +363,33 @@ public class Visit {
     // carOut 구역 시작==========================================
     private void carOut(){
         boolean flag = false;
+        String[] input = currentTime.split("-|/|:");
+        for(int i=0; i<input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
+        }
+
+        input0 = (int)Double.parseDouble(input[0]);
+        input1 = (int)Double.parseDouble(input[1]);
+        input2 = (int)Double.parseDouble(input[2]);
+        input3 = (int)Double.parseDouble(input[3]);
+        input4 = (int)Double.parseDouble(input[4]);
+
+        clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+        pathname = input0+"-"+input1+"-"+input2;
+
+        try{
+            FileInputStream currentFile = new FileInputStream(pathname + "/visited.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
+            if(in.readLine() == null)
+            {
+                System.out.println("주차장이 모두 비어있습니다. 출차 하실 수 없습니다.");
+                System.exit(0);
+            }
+            in.close();
+        }catch (Exception e)
+        {
+            e.getStackTrace();
+        }
         while(!flag)
         {
             flag = inputCarNum() && !isCarExist(); //형식이 올바르고 현재 주차중인 차량이라면
@@ -316,9 +406,43 @@ public class Visit {
 
     private void exitCompleted() {
         //visited 텍스트 파일에서 해당 차량 번호 찾아서 없애야함
+
+        String[] split = clearDateTime.split("/");
+
+        String getLine;
+        try{
+            File currentTime = new File(split[0] + "/visited.txt");
+            File tmpFile = new File(split[0]+ "/$$$$$$$$.txt");
+            FileOutputStream fout = new FileOutputStream(tmpFile);
+            PrintWriter out = new PrintWriter(fout);
+            FileInputStream currentFile = new FileInputStream(split[0]+ "/visited.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(currentFile));
+
+            while((getLine = br.readLine()) != null){
+                String line;
+
+                if(getLine.contains(carNum))
+                    continue;
+                out.println(getLine);
+
+            }
+            out.flush();
+            out.close();
+            fout.close();
+            br.close();
+            currentTime.delete();
+            //임시파일을 원래 파일명으로 변경
+            tmpFile.renameTo(currentTime);
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
+
+
+}
     // carOut 구역 끝==========================================
 
 
 
-}
+

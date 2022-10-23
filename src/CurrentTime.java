@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.Scanner;
 
 public class CurrentTime {
-
+    String[] split;
     int menuNum;
     String date_time;
 
@@ -290,7 +290,7 @@ public class CurrentTime {
             break;
         }
     }
-    String[] split;
+
     public void createtxt(){
         //파일 생성
         split = clearDateTime.split("/");

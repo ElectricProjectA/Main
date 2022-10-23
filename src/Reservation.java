@@ -48,18 +48,26 @@ public class Reservation {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요");
         }
 
-        printParkingStatus();//예약 가능한 자리면 true 불가능한 자리면 false 로 2차원 배열 parkA,park B 에 저장해주세용
-        enterParkingSeat(); //주차를 원하는 자리 입력
-        if(inputCarNum()) { //올바른 형식으로 입력했는지 확인
-            if(isAlreadyReserved()) //이미 예약한 차량인지 확인
-            {
-                System.out.println("이미 예약하셨습니다");
-                System.exit(0);
-            }
-            else
-            {
-                reservationCompleted();
-                System.out.println("예약이 완료되었습니다.");
+
+
+        boolean isNotOk = true;
+        while(isNotOk)
+        {
+            printParkingStatus();//예약 가능한 자리면 true 불가능한 자리면 false 로 2차원 배열 parkA,park B 에 저장해주세용
+            enterParkingSeat(); //주차를 원하는 자리 입력
+            if(inputCarNum()) { //올바른 형식으로 입력했는지 확인
+
+                isNotOk = isAlreadyReserved();
+                if(isNotOk)
+                {
+                    System.out.println("이미 예약되어있습니다. 다시 입력하세요");
+                }
+                else
+                {
+                    isNotOk = false;
+                    reservationCompleted();
+                    System.out.println("예약이 완료되었습니다.");
+                }
             }
         }
 
@@ -205,8 +213,9 @@ public class Reservation {
         StringBuffer sb = new StringBuffer();
         FileReader readFile;
         String getLine;
-
+        //File reserveFile = new File(split[0]);
         try {
+
             readFile = new FileReader(split[0] + "/booked.txt");
 
             BufferedReader br = new BufferedReader(readFile);
@@ -229,11 +238,12 @@ public class Reservation {
 
     private void printParkingStatus() throws ParseException {
         // 예약 날짜에 대한 현황만 출력하면 됨
-        String[] input = currentTime.split("-|/|:");
+        String[] input = clearReservationTime.split("-|/|:");
         for(int i=0; i<input.length; i++) {
             input[i] = input[i].replaceFirst("^0+(?!$)", "");
         }
-
+        int countA =0;
+        int countB =0;
         input0 = (int)Double.parseDouble(input[0]);
         input1 = (int)Double.parseDouble(input[1]);
         input2 = (int)Double.parseDouble(input[2]);
@@ -272,10 +282,12 @@ public class Reservation {
                 while((getLine = brr.readLine()) != null) {
                     String[] seat = getLine.split(" ")[0].split("-");
                     if(seat[0].equals("A")){
-                        parkA[Integer.parseInt(seat[1])][Integer.parseInt(seat[2])] = false;
+                        parkA[Integer.parseInt(seat[1])][Integer.parseInt(seat[2])] = true;
+                        countA++;
                     }
                     else{
-                        parkB[Integer.parseInt(seat[1])][Integer.parseInt(seat[2])] = false;
+                        parkB[Integer.parseInt(seat[1])][Integer.parseInt(seat[2])] = true;
+                        countB++;
                     }
 
                 }
@@ -293,18 +305,22 @@ public class Reservation {
                 String[] splittedArea = txtSplit[0].split("-");
                 if(splittedArea[0].equals("A")) { // A구역
                     if(bookedHour <= resHour && resHour <= bookedHour+4){
-                        parkA[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = false;
+                        parkA[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = true;
+                        countA++;
                     }
                     else if(resHour <= bookedHour && bookedHour <= resHour+4) {
-                        parkA[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = false;
+                        parkA[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = true;
+                        countA++;
                     }
                 }
-                else{ // A구역
+                else{ // B구역
                     if(bookedHour <= resHour && resHour <= bookedHour+4){
-                        parkB[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = false;
+                        parkB[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = true;
+                        countB++;
                     }
                     else if(resHour <= bookedHour && bookedHour <= resHour+4){
-                        parkB[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = false;
+                        parkB[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = true;
+                        countB++;
                     }
                 }
             }
@@ -313,6 +329,26 @@ public class Reservation {
             e.printStackTrace();
         } catch(IOException e) {
             e.printStackTrace();
+        }
+        System.out.println("A구역 : " + countA + "/16");
+        for (int i = 0; i < parkA.length; i++) {
+            for (int j = 0; j < parkA[0].length; j++) {
+                if(parkA[i][j])
+                    System.out.print("■ ");
+                else
+                    System.out.print("□ ");
+            }
+            System.out.println();
+        }
+        System.out.println("B구역 : " + countB + "/16");
+        for (int i = 0; i < parkB.length; i++) {
+            for (int j = 0; j < parkB[0].length; j++) {
+                if(parkB[i][j])
+                    System.out.print("■ ");
+                else
+                    System.out.print("□ ");
+            }
+            System.out.println();
         }
         // 예약 시간 +4시간 이내 영업 종료라면 공지하는 코드 추후 작성
     }
@@ -511,7 +547,27 @@ public class Reservation {
                 continue;
             }
 
+
             clearReservationTime = rinput0+"-"+rinput1+"-"+rinput2+"/"+rinput3+":"+rinput4;
+
+           
+            String[] split = clearReservationTime.split("/");
+            File reserveFile = new File(split[0]);
+            try {
+                if(!reserveFile.exists())
+                {
+                    reserveFile.mkdir();
+                    File visit = new File(split[0] + "/visited.txt");
+                    File booked = new File(split[0] + "/booked.txt");
+
+                    visit.createNewFile();
+                    booked.createNewFile();
+
+                }
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+
             break;
         }
 
