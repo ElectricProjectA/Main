@@ -170,29 +170,35 @@ public class Visit {
                     // 예약자를 예약자리에 넣은뒤, if noEmptySeats면 강제출차, 아니면 빈자리 찾아서 입차시켜줌
                     String[] occupyingVisiterInfo = occupyingVisiter().split(" ");
                     forceExitVisiter();
-                    deleteReservationAfterReservationCheck();
+                    parkingArea = reservedSpot;
                     entryCompleted();
+                    deleteReservationAfterReservationCheck();
 
                     if(noEmptySeats()) {
                         System.out.println("Occupying Visiter has force Exited");
                     } else {
-                        boolean isFindingEmptySpotOver = false;
-                        while(!isFindingEmptySpotOver){
-                            for(int i=0; i<4; i++) {
-                                for(int j=0; j<4; j++) {
+                        boolean isFindingEmptySpotNotOver = true;
+                        while(isFindingEmptySpotNotOver){
+                            for(int j=0; j<4; j++) {
+                                for(int i=0; i<4; i++) {
                                     if(!parkA[i][j]){
                                         // 그 자리에 입차시킴.
                                         parkingArea = "A-"+i+"-"+j;
                                         carNum = occupyingVisiterInfo[1];
                                         entryCompleted();
-                                        isFindingEmptySpotOver = true;
+                                        isFindingEmptySpotNotOver = false;
+                                        break;
                                     } else if(!parkB[i][j]) {
                                         // 그 자리에 입차시킴.
                                         parkingArea = "B-"+i+"-"+j;
                                         carNum = occupyingVisiterInfo[1];
                                         entryCompleted();
-                                        isFindingEmptySpotOver = true;
+                                        isFindingEmptySpotNotOver = false;
+                                        break;
                                     }
+                                }
+                                if(isFindingEmptySpotNotOver == false) {
+                                    break;
                                 }
                             }
                         }
