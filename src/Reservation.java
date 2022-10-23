@@ -1,23 +1,39 @@
 import java.io.*;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.lang.Integer;
-
 public class Reservation {
 
     private String currentTime;
+    private String clearCurrentTime;
     private String carNum;
     private boolean[][] parkA = new boolean[4][4];
     private boolean[][] parkB = new boolean[4][4];
     //printParkingStatus()에서, parkA와 parkB에 txt파일로부터 주차 정보를 가져와 저장함
     //parkA[i][j] = true면 주차된 자리, false이면 주차 가능한 자리
     private String reservationArea = ""; //주차한 위치
+    private String pathname;
+    private String clearReservationTime;
+    private String resTime;
+
+
+    int input0;
+    int input1;
+    int input2;
+    int input3;
+    int input4;
+    String t;
     public Reservation(String currentTime) {
         this.currentTime = currentTime;
     }
 
-    public void reservation()
+    public void reservation() throws ParseException
     {
         boolean flag = false;
         while(!flag)
@@ -125,7 +141,8 @@ public class Reservation {
     private boolean inputCarNum(){//visit에서 재활용 //올바르게 입력 할때까지 무한루프
         Scanner scan = new Scanner(System.in);
         while(true) { //올바른 형식을 입력할 때까지 while문 무한반복
-            System.out.print("차량 번호를 입력하세요: ");
+            System.out.println("차량 번호를 입력하세요 ex)123-가-1234");
+            System.out.print(">>>");
             carNum = scan.next();
             int hyphenNum = carNum.length() - carNum.replace("-","").length();
             String[] carNumPiece = carNum.split("-");
@@ -133,19 +150,21 @@ public class Reservation {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
+
             String[] pattern = {"\\d{3}", "[가-힣]{1}", "\\d{4}"};
-            boolean flag = true; //입력한 번호판 형식이 틀리면 false로 바뀜
+            boolean isLicensePlateSuitableToForm = true; //입력한 번호판 형식이 틀리면 false로 바뀜
             for(int i = 0; i < 3; i++) {
-                if (!Pattern.matches(pattern[i], carNumPiece[i])) { //입력 형식이 틀린 경우
-                    flag = false;
+                if (!Pattern.matches(pattern[i], carNumPiece[i])) {
+                    //입력 형식이 틀린 경우
+                    isLicensePlateSuitableToForm = false;
                     break;
                 }
             }
-            if(!flag) { //입력한 번호판 형식이 틀림
+            if(!isLicensePlateSuitableToForm) {
+                //입력한 번호판 형식이 틀림
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
-            }
-            else {
+            } else {
                 System.out.println("입력이 완료되었습니다.");
                 break;
             }
@@ -155,16 +174,14 @@ public class Reservation {
 
     private void reservationCompleted() {//txt에 저장
 
-
-        String[] split = currentTime.split("/");
-        String date = split[0];
+        String[] split = clearReservationTime.split("/");
         int menu = 1;
         File dir = new File(split[0]);
         if(dir.exists())
         {
             try{
                 FileOutputStream fVisited= new FileOutputStream(split[0] + "/booked.txt",true);
-                String fullString = reservationArea + " " + carNum + " " + currentTime +"\n";
+                String fullString = reservationArea + " " + carNum + " " + clearReservationTime +"\n";
                 fVisited.write(fullString.getBytes());
             }catch (Exception e)
             {
@@ -176,15 +193,16 @@ public class Reservation {
     }
 
     private boolean isAlreadyReserved() {
-        String[] split = currentTime.split("/");
+        String[] split = clearReservationTime.split("/");
         //currentTime: 생상자로 받아온 현재 날짜와 시각
         //(입력 예시: 2022-9-28/14:00)
 
         StringBuffer sb = new StringBuffer();
         FileReader readFile;
         String getLine;
-
+        //File reserveFile = new File(split[0]);
         try {
+
             readFile = new FileReader(split[0] + "/booked.txt");
 
             BufferedReader br = new BufferedReader(readFile);
@@ -205,10 +223,295 @@ public class Reservation {
         return false; //차량이 존재하지 않으면 false 반환
     }
 
-    private void printParkingStatus() {
+    private void printParkingStatus() throws ParseException {
+        // 예약 날짜에 대한 현황만 출력하면 됨
+        String[] input = currentTime.split("-|/|:");
+        for(int i=0; i<input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
+        }
+        int countA =0;
+        int countB =0;
+        input0 = (int)Double.parseDouble(input[0]);
+        input1 = (int)Double.parseDouble(input[1]);
+        input2 = (int)Double.parseDouble(input[2]);
+        input3 = (int)Double.parseDouble(input[3]);
+        input4 = (int)Double.parseDouble(input[4]);
+
+        clearCurrentTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+        pathname = input0+"-"+input1+"-"+input2;
+
+        String[] sp = clearCurrentTime.split("/");
+        //(입력 예시: 2022-9-28/14:00)
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-mm-dd/HH:mm");
+        Date resDate = timeFormat.parse(clearCurrentTime);
+        Calendar resCal = Calendar.getInstance();
+        resCal.setTime(resDate);
+        int resHour = resCal.get(Calendar.HOUR_OF_DAY);
+
+        // 예약은 최대 4시간 유효하므로 예약 시간 -4시간 했는데 이미 예약자가 있으면 안됨.
+        StringBuffer sb = new StringBuffer();
+        FileReader readBookedFile;
+        FileReader readVisitedFile;
+        String getLine;
+
+        try {
+            readBookedFile = new FileReader(pathname + "/booked.txt");
+            readVisitedFile = new FileReader(pathname + "/visited.txt");
+
+            // 방문자 처리
+            // 현재 날짜와 예약 날짜가 다르면 처리 안 해줘도 되고, 같으면 처리(Visit.java에서 활용 가능)
+            // inputReservationTime에서 이미 3일 이후나 이전 날짜 처리 했으니 연도는 체크 안 해도 됨. 월일이 같은데 연도가 다를 수가 없음
+            String[] currentDate = clearCurrentTime.split("/")[0].split("-"); // 2022 09 22
+            String[] rsvDate = clearReservationTime.split("/")[0].split("-"); // 2022 09 22
+            if(rsvDate[1].equals(currentDate[1]) && rsvDate[2].equals(currentDate[2])){
+                BufferedReader brr = new BufferedReader(readVisitedFile);
+                while((getLine = brr.readLine()) != null) {
+                    String[] seat = getLine.split(" ")[0].split("-");
+                    if(seat[0].equals("A")){
+                        parkA[Integer.parseInt(seat[1])][Integer.parseInt(seat[2])] = true;
+                        countA++;
+                    }
+                    else{
+                        parkB[Integer.parseInt(seat[1])][Integer.parseInt(seat[2])] = true;
+                        countB++;
+                    }
+
+                }
+            }
+
+            // 예약자 처리
+            BufferedReader br = new BufferedReader(readBookedFile);
+            while((getLine = br.readLine()) != null) {
+                Date bookedDate = timeFormat.parse(clearCurrentTime);
+                Calendar bookedCal = Calendar.getInstance();
+                bookedCal.setTime(bookedDate);
+                int bookedHour = bookedCal.get(Calendar.HOUR_OF_DAY);
+
+                String[] txtSplit = getLine.split(" "); //공백으로 구분
+                String[] splittedArea = txtSplit[0].split("-");
+                if(splittedArea[0].equals("A")) { // A구역
+                    if(bookedHour <= resHour && resHour <= bookedHour+4){
+                        parkA[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = true;
+                        countA++;
+                    }
+                    else if(resHour <= bookedHour && bookedHour <= resHour+4) {
+                        parkA[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = true;
+                        countA++;
+                    }
+                }
+                else{ // B구역
+                    if(bookedHour <= resHour && resHour <= bookedHour+4){
+                        parkB[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = true;
+                        countB++;
+                    }
+                    else if(resHour <= bookedHour && bookedHour <= resHour+4){
+                        parkB[Integer.parseInt(splittedArea[1])][Integer.parseInt(splittedArea[2])] = true;
+                        countB++;
+                    }
+                }
+            }
+            br.close();
+        } catch(FileNotFoundException e) {
+            e.printStackTrace();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("A구역 : " + countA + "/16");
+        for (int i = 0; i < parkA.length; i++) {
+            for (int j = 0; j < parkA[0].length; j++) {
+                if(parkA[i][j])
+                    System.out.print("■ ");
+                else
+                    System.out.print("□ ");
+            }
+            System.out.println();
+        }
+        System.out.println("B구역 : " + countB + "/16");
+        for (int i = 0; i < parkB.length; i++) {
+            for (int j = 0; j < parkB[0].length; j++) {
+                if(parkB[i][j])
+                    System.out.print("■ ");
+                else
+                    System.out.print("□ ");
+            }
+            System.out.println();
+        }
+        // 예약 시간 +4시간 이내 영업 종료라면 공지하는 코드 추후 작성
     }
 
-    private boolean inputReservationTime() {
+    private boolean inputReservationTime() throws ParseException {
+//        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-mm-dd/HH:mm");
+//        Date currentDate = timeFormat.parse(clearcurrentTime);
+//        Calendar curCal = Calendar.getInstance();
+//        curCal.setTime(currentDate);
+
+        Scanner sc = new Scanner(System.in);
+        while(true){
+            System.out.println("예약 날짜 및 시간을 입력하세요. 시간은 30분 단위입니다. (입력 예시: 2022-09-29/12:00)");
+            System.out.print("(종료하려면 q를 입력하세요) => ");
+            t = sc.next();
+            t.trim();
+            if(t.equals("q")) System.exit(0);
+
+//            Date bookDate = timeFormat.parse(t);
+//            Calendar bookCal = Calendar.getInstance();
+//            bookCal.setTime(bookDate);
+//
+//            // 현재시간보다 이전의 시간
+//            if(curCal.getTimeInMillis() > bookCal.getTimeInMillis()){
+//                System.out.println("현재 날짜보다 이전입니다. 다시 입력해주세요.");
+//                continue;
+//            }
+//
+//            // 3일 이후 날짜 예약 시도
+//            curCal.add(Calendar.DATE, 3);
+//            if(curCal.getTimeInMillis() < bookCal.getTimeInMillis()){
+//                System.out.println("현재 날짜로부터 3일 이내 날짜의 예약만 가능합니다. 다시 입력해주세요.");
+//                continue;
+//            }
+//
+//            // 폐점시간 예약 시도
+//            if(bookCal.HOUR_OF_DAY < 8 || bookCal.HOUR_OF_DAY > 18){
+//                System.out.println("해당 시간에는 예약이 제한됩니다. 다시 입력해주세요.");
+//                continue;
+//            }
+//
+//            // 30분 단위가 아닐 경우
+//            if(bookCal.MINUTE != 0 || bookCal.MINUTE != 30){
+//                System.out.println("예약 시간은 30분 단위로 입력받습니다. 다시 입력해주세요.");
+//                continue;
+//            }
+
+            int hyphenNum = t.length() - t.replace("-","").length();
+            int slashNum = t.length() - t.replace("/","").length();
+            int twodotNum = t.length() - t.replace(":","").length();
+            String[] input = t.split("-|/|:");
+
+            boolean loop=false;
+            outerloop:
+            for(int i=0; i<input.length; i++){
+                input[i]=input[i].replaceFirst("^0+(?!$)", "");
+                for(int j=0; j<input[i].length(); j++){
+                    if((int)input[i].charAt(j) == 46)
+                        continue;
+                    else if((int)input[i].charAt(j) <48 || (int)input[i].charAt(j) >57){
+                        System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                        loop=true;
+                        break outerloop;
+                    }
+                }
+            }
+            if(loop){
+                continue;
+            }
+
+
+
+            if(input.length != 5){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }
+            if(hyphenNum != 2){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }
+            if(slashNum != 1){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }
+            if(twodotNum != 1){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }
+
+            //소수점입력 받았을 때 처리
+            input0 = (int)Double.parseDouble(input[0]);
+            input1 = (int)Double.parseDouble(input[1]);
+            input2 = (int)Double.parseDouble(input[2]);
+            input3 = (int)Double.parseDouble(input[3]);
+            input4 = (int)Double.parseDouble(input[4]);
+
+            if(input0 < 1970){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }else if(input0 > 2037){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }
+
+            if(input1 > 12){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }else if(input1 < 1){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }
+
+
+            if(input1==1 || input1==3 || input1==5 || input1==7 || input1==8 || input1==10 || input1==12){
+                if(input2<1){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                    continue;
+                }else if(input2 > 31){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                    continue;
+                }
+            }else if(input1==2){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                if(input2 < 1){
+                    continue;
+                }else if(input2> 28){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                    continue;
+                }
+            }else if(input1==4 || input1==6 || input1==9 || input1==11) {
+                if(input2 < 1){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                    continue;
+                }else if(input2> 30){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                    continue;
+                }
+            }
+
+            // input3 = hour
+            if(input3 < 8){
+                System.out.println("영업시간은 08시부터입니다.");
+                continue;
+            }else if(input3 > 21){
+                System.out.println("영업시간은 22시까지입니다.");
+                continue;
+            }
+
+            if(input4 < 0){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }else if(input4 > 59){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }
+
+            clearReservationTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+            String[] split = clearReservationTime.split("/");
+            File reserveFile = new File(split[0]);
+            try {
+                if(!reserveFile.exists())
+                {
+                    reserveFile.mkdir();
+                    File visit = new File(split[0] + "/visited.txt");
+                    File booked = new File(split[0] + "/booked.txt");
+
+                    visit.createNewFile();
+                    booked.createNewFile();
+
+                }
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+            break;
+        }
+
         return true;
     }
 }
