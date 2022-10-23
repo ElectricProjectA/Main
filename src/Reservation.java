@@ -480,9 +480,9 @@ public class Reservation {
                     }else if(currmonth<rinput1&& (date-currday+rinput2) > 3){
                         System.out.println("3일 이후는 예약할 수 없습니다.");
                         continue;
-                    }else {
+                    }else {//pppppppppppppp
                         // when years, months and dates are the same
-                        if((Integer.parseInt(currentTime[3]) > rinput3)) {
+                        if(currday > rinput2 && (Integer.parseInt(currentTime[3]) > rinput3)) {
                             System.out.println("기록된 time 보다 과거입니다");
                             continue;
                         }else {

@@ -8,6 +8,7 @@ public class Visit {
 
     private String parkingArea = "";
     Scanner scan = new Scanner(System.in);
+    private String reservedSpot; // isReservedUser()에서 씀.
     private String carNum; // for license plate number
     private String carArea;
     private String currentTime;
@@ -147,22 +148,38 @@ public class Visit {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요");
             }
         }
-        System.out.println("차량 번호 확인이 완료되었습니다. 예약 여 확인 단계로 넘어갑니다.");
+        System.out.println("차량 번호 확인이 완료되었습니다. 예약 여부 확인 단계로 넘어갑니다.");
 
-        //2. 예약 고객인지 확인
-        if(isReserved()) {
-            //예약 고객
-            if(!isReservedSeatFull()) {
-                //예약자리가 비어있음
-                entryCompleted();
-            }
-            else {
-                //예약자리가 차있음
+        //2. 예약 고객인지 확인- 재원 part
+        if(isReservedUser()) {
+            // when user have reserved
+            if(isReservedSeatOccupied()) {
                 if(noEmptySeats()) {
-                    //빈자리가 아예 없음
-                    forcedExit();
+                    forceExitVisiter();
+                    entryCompleted();
+                } else {
+                    // 비어있는 자리 찾아서 입차시켜줌.
+                    boolean isFindingEmptySpotOver = false;
+                    while(!isFindingEmptySpotOver){
+                        for(int i=0; i<4; i++) {
+                            for(int j=0; j<4; j++) {
+                                if(!parkA[i][j]){
+                                    // 그 자리에 입차시킴.
+                                    parkingArea = "A-"+i+"-"+j;
+                                    entryCompleted();
+                                    isFindingEmptySpotOver = true;
+                                } else if(!parkB[i][j]) {
+                                    // 그 자리에 입차시킴.
+                                    parkingArea = "B-"+i+"-"+j;
+                                    entryCompleted();
+                                    isFindingEmptySpotOver = true;
+                                }
+                            }
+                        }
+                    }
                 }
-                entryCompleted(); //이게 txt 넣는 곳
+            } else {
+                entryCompleted();
             }
         } else {
             //미예약 고객
@@ -171,7 +188,121 @@ public class Visit {
             entryCompleted();//이게 txt 넣는 곳
         }
     }
+    private boolean isReservedUser() {
+        System.out.println("Checking if you've made a reservation...");
 
+        boolean isCarReserved = false;
+
+        String[] splitCurrentTimeforReserveCheck = currentTime.split("/");
+        //currentTime: 생상자로 받아온 현재 날짜와 시각
+
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+
+        String[] input = currentTime.split("-|/|:");
+        for (int i = 0; i < input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
+        }
+
+        input0 = (int) Double.parseDouble(input[0]);
+        input1 = (int) Double.parseDouble(input[1]);
+        input2 = (int) Double.parseDouble(input[2]);
+        input3 = (int) Double.parseDouble(input[3]);
+        input4 = (int) Double.parseDouble(input[4]);
+
+        clearDateTime = input0 + "-" + input1 + "-" + input2 + "/" + input3 + ":" + input4;
+        pathname = input0 + "-" + input1 + "-" + input2;
+        try {
+            readFile = new FileReader(pathname + "/booked.txt");
+
+            BufferedReader brforReserveCheck = new BufferedReader(readFile);
+
+            while ((getLine = brforReserveCheck.readLine()) != null) {
+                //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작
+                String[] txtSplit = getLine.split(" "); //공백으로 구분
+                if (txtSplit[1].contains(carNum)) {
+                    reservedSpot = txtSplit[0];
+                    System.out.println(carNum + "차량은 현재 예약되어있는 차량입니다.");
+                    isCarReserved = true; // returns true if the car has reserved
+                }
+            }
+            brforReserveCheck.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //System.out.println("isCarReserved: "+isCarReserved);
+        return isCarReserved;
+    }
+    private boolean isReservedSeatOccupied()
+    {
+        // read visited.txt & 만약 visited에 car 있으면 true 반환
+        System.out.println("Checking if the spot is occupied...");
+        boolean isReservedSeatOccupied = false;
+
+        String[] split = currentTime.split("/");
+
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+
+        try {
+            readFile = new FileReader(split[0] + "/visited.txt");
+
+            BufferedReader br = new BufferedReader(readFile);
+            while((getLine = br.readLine()) != null) {
+                //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작
+                String[] txtSplit = getLine.split(" "); //공백으로 구분
+                if(txtSplit[0].contains(reservedSpot)) {
+                    isReservedSeatOccupied = true; //차량이 존재하면 true 반환
+                }
+            }
+            br.close();
+        } catch(FileNotFoundException e) {
+            e.printStackTrace();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+        return isReservedSeatOccupied;
+    }
+
+    private void forceExitVisiter() {
+        // 기존 그 자리에 예약된걸 출차처리함
+
+        System.out.println("Force exiting occupying visitor");
+        String[] split = clearDateTime.split("/");
+        String getLine;
+        try{
+            File currentTime = new File(split[0] + "/visited.txt");
+
+            File tmpFile = new File(split[0]+ "/$$$$$$$$.txt");
+            FileOutputStream streamOutFortmpFile = new FileOutputStream(tmpFile);
+            PrintWriter writerOutFortmpFile = new PrintWriter(streamOutFortmpFile);
+            FileInputStream currentFile = new FileInputStream(split[0]+ "/visited.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(currentFile));
+
+            while((getLine = br.readLine()) != null){
+                if(getLine.contains(reservedSpot)){
+                    continue;
+                } else {
+                    writerOutFortmpFile.println(getLine);
+                }
+            }
+            writerOutFortmpFile.flush();
+            writerOutFortmpFile.close();
+            streamOutFortmpFile.close();
+            br.close();
+            currentTime.delete();
+            //임시파일을 원래 파일명으로 변경
+            tmpFile.renameTo(currentTime);
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
     private void enterParkingSeat() {
         //올바르게 입력 할때까지 무한루프
         boolean A = true;
