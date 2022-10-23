@@ -496,6 +496,7 @@ public class Reservation {
                 }
             }
 
+
             if(rinput1 > 12){
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
@@ -506,6 +507,7 @@ public class Reservation {
             if(Integer.parseInt(currentTime[0]) == rinput0 )
             {
                 clearReservationTime = rinput0+"-"+rinput1+"-"+rinput2+"/"+rinput3+":"+rinput4;
+
                 break;
 
             }

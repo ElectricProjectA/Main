@@ -14,6 +14,7 @@ public class CurrentTime {
     int input3;
     int input4;
     String clearDateTime;
+
     public CurrentTime() {
 
     }
@@ -212,7 +213,6 @@ public class CurrentTime {
                     //"2020-10-03/14:01"
                     if(k==0)
                     {
-                        System.out.println("***Test***");
                         String[] split1 = thisLine.split("-|/|:");
                         String[] split2 = clearDateTime.split("-|/|:");
                         boolean flag = true;
@@ -265,7 +265,6 @@ public class CurrentTime {
                             break;
                         }
                     }
-
                     out.println(thisLine);
                     k++;
                 } // while 구문 끝
