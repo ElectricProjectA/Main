@@ -336,7 +336,7 @@ public class CurrentTime {
                 String[] bookedInfo = getLine.split(" |:|/");
 
                 //A-3-1 123-가-1234 2022-7-22/15:00
-                if((Integer.parseInt(standardTimesplit[0])*60+Integer.parseInt(standardTimesplit[1]))-(Integer.parseInt(bookedInfo[2])*60+Integer.parseInt(bookedInfo[3]))>120){
+                if((Integer.parseInt(standardTimesplit[0])*60+Integer.parseInt(standardTimesplit[1]))-(Integer.parseInt(bookedInfo[3])*60+Integer.parseInt(bookedInfo[4]))>120){
 
                     System.out.println(bookedInfo[1]+"차량의 노쇼처리가 완료되었습니다.");
                     continue;
