@@ -119,10 +119,16 @@ public class Visit {
 
             while((getLine = br.readLine()) != null) {
                 //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작
-                String[] txtSplit = getLine.split(" "); //공백으로 구분
-                if(txtSplit[1].contains(carNum)) {
-                    System.out.println(carNum + "차량은 현재 주차되어있는 차량입니다.");
-                    return false; //차량이 존재하면 false 반환
+                if(getLine.replaceFirst(" \n", "") == "") {
+                    //만약 visited.txt에 공백으로만 된 줄이 있으면 무시하고 다음줄 읽기
+                    //.......로 하는게 목적이었는데 if조건문 안에 뭘 넣어야하는지 모르겠음. 공백줄 없으면 에러는 안남.
+                    continue;
+                } else {
+                    String[] txtSplit = getLine.split(" "); //공백으로 구분
+                    if(txtSplit[1].contains(carNum)) {
+                        System.out.println(carNum + "차량은 현재 주차되어있는 차량입니다.");
+                        return false; //차량이 존재하면 false 반환
+                    }
                 }
             }
             br.close();
@@ -157,6 +163,8 @@ public class Visit {
             if(isReservedSeatOccupied()) {
                 if(noEmptySeats()) {
                     forceExitVisiter();
+                    parkingArea = reservedSpot;
+                    deleteReservationAfterReservationCheck();
                     entryCompleted();
                 } else {
                     // 비어있는 자리 찾아서 입차시켜줌.
@@ -180,9 +188,10 @@ public class Visit {
                     }
                 }
             } else {
+                parkingArea = reservedSpot;
+                deleteReservationAfterReservationCheck();
                 entryCompleted();
             }
-            deleteReservationAfterReservationCheck();
         } else {
             //미예약 고객
             printParkingStatus();
@@ -372,7 +381,7 @@ public class Visit {
                 String[] txtSplit = getLine.split(" "); //공백으로 구분
                 if (txtSplit[1].contains(carNum)) {
                     reservedSpot = txtSplit[0];
-                    System.out.println(carNum + "차량은 현재 예약되어있는 차량입니다.");
+                    System.out.println("Reserved spot is: "+reservedSpot);
                     isCarReserved = true; // returns true if the car has reserved
                 }
             }
@@ -382,7 +391,12 @@ public class Visit {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //System.out.println("isCarReserved: "+isCarReserved);
+
+        if(isCarReserved) {
+            System.out.println("You have made a reservation with the plate number:"+carNum);
+        } else {
+            System.out.println("You haven't made a reservation");
+        }
         return isCarReserved;
     }
 
@@ -456,6 +470,8 @@ public class Visit {
     }
 
     private void deleteReservationAfterReservationCheck() {
+        // 원래 미예약 입차 고객이라면 입력을 받는 parkingArea를 예약내역에 있는 주차 자리로 갱신해줌.
+
         System.out.println("Deleteing you reservation since you just visited...");
         String[] split = clearDateTime.split("/");
         String getLine;
@@ -470,6 +486,11 @@ public class Visit {
 
             while((getLine = br.readLine()) != null){
                 if(getLine.contains(reservedSpot)){
+                    /*
+                    String[] reservationInfo = getLine.split(" ");
+                    parkingArea = reservationInfo[0].replaceFirst("^0+(?!$)", "");
+                    System.out.println("parkingArea at deleteReservation:" + parkingArea);
+                    */
                     continue;
                 } else {
                     writerOutFortmpFile.println(getLine);
@@ -564,6 +585,7 @@ public class Visit {
         {
             try {
                 FileOutputStream fVisited= new FileOutputStream(pathname + "/visited.txt",true);
+                System.out.print(parkingArea);
                 String fullString = parkingArea + " " + carNum + " " + clearDateTime +"\n";
                 fVisited.write(fullString.getBytes());
             } catch (Exception e) {
