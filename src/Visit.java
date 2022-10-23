@@ -13,6 +13,14 @@ public class Visit {
     private String currentTime;
     private boolean[][] parkA = new boolean[4][4];
     private boolean[][] parkB = new boolean[4][4];
+
+    int input0;
+    int input1;
+    int input2;
+    int input3;
+    int input4;
+
+    String clearDateTime;
     public Visit(String currentTime) {
         this.currentTime = currentTime;
     }
@@ -78,6 +86,8 @@ public class Visit {
         return true;
     }
 
+    String pathname;
+
     private boolean isCarExist() {
         String[] split = currentTime.split("/");
         //currentTime: 생상자로 받아온 현재 날짜와 시각
@@ -87,8 +97,21 @@ public class Visit {
         FileReader readFile;
         String getLine;
 
+        String[] input = currentTime.split("-|/|:");
+        for(int i=0; i<input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
+        }
+
+        input0 = (int)Double.parseDouble(input[0]);
+        input1 = (int)Double.parseDouble(input[1]);
+        input2 = (int)Double.parseDouble(input[2]);
+        input3 = (int)Double.parseDouble(input[3]);
+        input4 = (int)Double.parseDouble(input[4]);
+
+        clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+        pathname = input0+"-"+input1+"-"+input2;
         try {
-            readFile = new FileReader(split[0] + "/visited.txt");
+            readFile = new FileReader(pathname + "/visited.txt");
 
             BufferedReader br = new BufferedReader(readFile);
 
@@ -241,15 +264,15 @@ public class Visit {
 
     private void entryCompleted() {
 
-        String[] split = currentTime.split("/");
+        String[] split = clearDateTime.split("/");
         String date = split[0];
         int menu = 1;
-        File dir = new File(split[0]);
+        File dir = new File(pathname);
         if(dir.exists())
         {
             try{
-                FileOutputStream fVisited= new FileOutputStream(split[0] + "/visited.txt",true);
-                String fullString = parkingArea + " " + carNum + " " + currentTime +"\n";
+                FileOutputStream fVisited= new FileOutputStream(pathname + "/visited.txt",true);
+                String fullString = parkingArea + " " + carNum + " " + clearDateTime +"\n";
                 fVisited.write(fullString.getBytes());
             }catch (Exception e)
             {

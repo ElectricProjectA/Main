@@ -7,6 +7,13 @@ public class CurrentTime {
     String date_time;
 
     File reservation;
+
+    int input0;
+    int input1;
+    int input2;
+    int input3;
+    int input4;
+    String clearDateTime;
     public CurrentTime() {
 
     }
@@ -38,6 +45,7 @@ public class CurrentTime {
             System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시:2022-9-28/14:00) ");
             System.out.print(">>>");
             date_time = scanner.next();
+            date_time.trim();
 
             //구분자 개수 찾기
             int hyphenNum = date_time.length() - date_time.replace("-","").length();
@@ -69,66 +77,87 @@ public class CurrentTime {
             }
             */
 
-
+            boolean loop=false;
+            outerloop:
+            for(int i=0; i<input.length; i++){
+                input[i]=input[i].replaceFirst("^0+(?!$)", "");
+                for(int j=0; j<input[i].length(); j++){
+                    if((int)input[i].charAt(j) == 46)
+                        continue;
+                    else if((int)input[i].charAt(j) <48 || (int)input[i].charAt(j) >57){
+                        System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                        loop=true;
+                        break outerloop;
+                    }
+                }
+            }
+            if(loop){
+                continue;
+            }
 
             if(input.length != 5){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
             if(hyphenNum != 2){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
             if(slashNum != 1){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
             if(twodotNum != 1){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
 
-            //입력값 앞에 0제거
-//            for(int i=0; i<5; i++){
-//                input[i]=input[i].replaceFirst("^0+(?!$)", "");
-//                if(!Character.isDigit(input[i])){
-//                    System.out.println("잘못된 입력입니다. 다시 입력해주세요");
-//                }
-//            }
-
             //소수점입력 받았을 때 처리
-            int input0 = (int)Double.parseDouble(input[0]);
-            int input1 = (int)Double.parseDouble(input[1]);
-            int input2 = (int)Double.parseDouble(input[2]);
-            int input3 = (int)Double.parseDouble(input[3]);
-            int input4 = (int)Double.parseDouble(input[4]);
-
+            input0 = (int)Double.parseDouble(input[0]);
+            input1 = (int)Double.parseDouble(input[1]);
+            input2 = (int)Double.parseDouble(input[2]);
+            input3 = (int)Double.parseDouble(input[3]);
+            input4 = (int)Double.parseDouble(input[4]);
 
             if(input0 < 1970){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }else if(input0 > 2037){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
 
             if(input1 > 12){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }else if(input1 < 1){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
 
 
             if(input1==1 || input1==3 || input1==5 || input1==7 || input1==8 || input1==10 || input1==12){
                 if(input2<1){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                     continue;
                 }else if(input2 > 31){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                     continue;
                 }
             }else if(input1==2){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 if(input2 < 1){
                     continue;
                 }else if(input2> 28){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                     continue;
                 }
             }else if(input1==4 || input1==6 || input1==9 || input1==11) {
                 if(input2 < 1){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                     continue;
                 }else if(input2> 30){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                     continue;
                 }
             }
@@ -143,10 +172,14 @@ public class CurrentTime {
             }
 
             if(input4 < 0){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }else if(input4 > 59){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
+
+            clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
 
 
             //--현재 타임 로그 저장---
@@ -181,7 +214,7 @@ public class CurrentTime {
                     {
                         System.out.println("***Test***");
                         String[] split1 = thisLine.split("-|/|:");
-                        String[] split2 = date_time.split("-|/|:");
+                        String[] split2 = clearDateTime.split("-|/|:");
                         boolean flag = true;
 
                         if((Integer.parseInt(split2[0]) < Integer.parseInt(split1[0]))) {
@@ -225,7 +258,7 @@ public class CurrentTime {
                         }
 
                         if(flag) {
-                            out.println(date_time);
+                            out.println(clearDateTime);
                         } else {
                             System.out.println("기록된 현재 시간보다 더 이전 시간을 입력하실 수 없습니다.");
                             pastFlag = true;
@@ -242,7 +275,7 @@ public class CurrentTime {
                     continue;
 
                 if(thisLine == null && k ==0)
-                    out.println(date_time);
+                    out.println(clearDateTime);
 
                 out.flush();
                 out.close();
@@ -260,18 +293,17 @@ public class CurrentTime {
     String[] split;
     public void createtxt(){
         //파일 생성
-        split = date_time.split("/");
+        split = clearDateTime.split("/");
         String path = System.getProperty("user.dir"); //현재 파일 경로 가져오기
         //Path directoryPath = Paths.get(path+ "\\" + split[0]); // Main 아래에 현재 날짜로 폴더 생성
 
         String date[] = split[0].split("-");
-        String pathname=date[0].replaceFirst("^0+(?!$)", "")+"-"+date[1].replaceFirst("^0+(?!$)", "")+"-"+date[2].replaceFirst("^0+(?!$)", "");
-        File dir = new File(pathname);
+        File dir = new File(split[0]);
         if(!dir.exists())
         {
             dir.mkdir();	//폴더 만들기
-            File visit = new File(pathname + "/visited.txt");
-            reservation = new File(pathname + "/booked.txt");
+            File visit = new File(split[0] + "/visited.txt");
+            reservation = new File(split[0] + "/booked.txt");
             try{
                 visit.createNewFile();
                 reservation.createNewFile();
@@ -281,7 +313,7 @@ public class CurrentTime {
         }
         else
         {
-            reservation = new File(pathname + "/booked.txt");
+            reservation = new File(split[0] + "/booked.txt");
         }
     }
 
@@ -291,12 +323,11 @@ public class CurrentTime {
         String getLine;
 
         String date[] = split[0].split("-");
-        String pathname=date[0].replaceFirst("^0+(?!$)", "")+"-"+date[1].replaceFirst("^0+(?!$)", "")+"-"+date[2].replaceFirst("^0+(?!$)", "");
         try{
             if(menuNum==1){
-                readFile = new FileReader(pathname+ "/visited.txt");
+                readFile = new FileReader(split[0]+ "/visited.txt");
             }else{
-                readFile = new FileReader(pathname+ "/booked.txt");
+                readFile = new FileReader(split[0]+ "/booked.txt");
             }
 
             BufferedReader br = new BufferedReader(readFile);
@@ -320,8 +351,8 @@ public class CurrentTime {
         //주차구역-차량번호-예약시간 인데 예약시간+2<현재시간이면 노쇼
 
         String date[] = split[0].split("-");
-        String pathname=date[0].replaceFirst("^0+(?!$)", "")+"-"+date[1].replaceFirst("^0+(?!$)", "")+"-"+date[2].replaceFirst("^0+(?!$)", "");
-        String standardDate = pathname; //날짜
+
+        String standardDate = split[0]; //날짜
         String standardTime = split[1]; //시간
 
         String[] standardTimesplit = standardTime.split(":"); //시간, 분 따로
@@ -350,6 +381,7 @@ public class CurrentTime {
             }
             out.flush();
             out.close();
+            fout.close();
             br.close();
             reservation.delete();
             //임시파일을 원래 파일명으로 변경
