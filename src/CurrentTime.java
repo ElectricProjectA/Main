@@ -34,7 +34,7 @@ public class CurrentTime {
 
     public void setting1(){
         readtxt();
-        noShowHandling();
+        //noShowHandling();
     }
 
     private void enterCurrentTime() {
@@ -42,7 +42,7 @@ public class CurrentTime {
         Scanner scanner = new Scanner(System.in);
 
         while(true){
-            System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시:2022-9-28/14:00) ");
+            System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시:2022-9-3/11:01) ");
             System.out.print(">>>");
             date_time = scanner.next();
             date_time.trim();

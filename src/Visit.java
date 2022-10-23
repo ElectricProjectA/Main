@@ -10,8 +10,8 @@ public class Visit {
     Scanner scan = new Scanner(System.in);
     private String reservedSpot; // isReservedUser()에서 씀.
     private String carNum; // for license plate number
-    private String carArea;
     private String currentTime;
+    String clearDateTime;
     private boolean[][] parkA = new boolean[4][4];
     private boolean[][] parkB = new boolean[4][4];
 
@@ -21,7 +21,6 @@ public class Visit {
     int input3;
     int input4;
 
-    String clearDateTime;
     public Visit(String currentTime) {
         this.currentTime = currentTime;
     }
@@ -156,6 +155,8 @@ public class Visit {
             if(isReservedSeatOccupied()) {
                 if(noEmptySeats()) {
                     forceExitVisiter();
+                    parkingArea = reservedSpot;
+                    deleteReservationAfterReservationCheck();
                     entryCompleted();
                 } else {
                     // 비어있는 자리 찾아서 입차시켜줌.
@@ -167,11 +168,13 @@ public class Visit {
                                     // 그 자리에 입차시킴.
                                     parkingArea = "A-"+i+"-"+j;
                                     entryCompleted();
+                                    deleteReservationAfterReservationCheck();
                                     isFindingEmptySpotOver = true;
                                 } else if(!parkB[i][j]) {
                                     // 그 자리에 입차시킴.
                                     parkingArea = "B-"+i+"-"+j;
                                     entryCompleted();
+                                    deleteReservationAfterReservationCheck();
                                     isFindingEmptySpotOver = true;
                                 }
                             }
@@ -179,6 +182,8 @@ public class Visit {
                     }
                 }
             } else {
+                parkingArea = reservedSpot;
+                deleteReservationAfterReservationCheck();
                 entryCompleted();
             }
         } else {
@@ -188,6 +193,7 @@ public class Visit {
             entryCompleted();//이게 txt 넣는 곳
         }
     }
+
     private boolean isReservedUser() {
         System.out.println("Checking if you've made a reservation...");
 
@@ -223,7 +229,7 @@ public class Visit {
                 String[] txtSplit = getLine.split(" "); //공백으로 구분
                 if (txtSplit[1].contains(carNum)) {
                     reservedSpot = txtSplit[0];
-                    System.out.println(carNum + "차량은 현재 예약되어있는 차량입니다.");
+                    System.out.println("Your reserved spot is:" + carNum);
                     isCarReserved = true; // returns true if the car has reserved
                 }
             }
@@ -238,7 +244,6 @@ public class Visit {
     }
     private boolean isReservedSeatOccupied()
     {
-        // read visited.txt & 만약 visited에 car 있으면 true 반환
         System.out.println("Checking if the spot is occupied...");
         boolean isReservedSeatOccupied = false;
 
@@ -270,9 +275,9 @@ public class Visit {
     }
 
     private void forceExitVisiter() {
-        // 기존 그 자리에 예약된걸 출차처리함
+        // 예약자리에 입차 차량이 있을때 출차처리함.
 
-        System.out.println("Force exiting occupying visitor");
+        System.out.println("Force exiting occupying visitor...");
         String[] split = clearDateTime.split("/");
         String getLine;
         try{
@@ -303,6 +308,108 @@ public class Visit {
             e.printStackTrace();
         }
     }
+
+    private boolean noEmptySeats() {
+        // 주차장 loop 돌리기
+        System.out.println("Checking if there are empty seats...");
+        boolean isParkinglotFull = true;
+
+        String[] input = currentTime.split("-|/|:");
+        for(int i=0; i<input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
+        }
+
+        input0 = (int)Double.parseDouble(input[0]);
+        input1 = (int)Double.parseDouble(input[1]);
+        input2 = (int)Double.parseDouble(input[2]);
+        input3 = (int)Double.parseDouble(input[3]);
+        input4 = (int)Double.parseDouble(input[4]);
+
+        clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+        pathname = input0+"-"+input1+"-"+input2;
+        int countA = 0;
+        int countB =0;
+        try{
+            FileInputStream currentFile = new FileInputStream(pathname + "/visited.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
+            String getLine = "";
+            int k=0;
+            while((getLine = in.readLine()) != null)
+            {
+                String[] fullString = getLine.split(" ");
+                String[] split = fullString[0].split("-");
+                int n1 = Integer.parseInt(split[1]);
+                int n2 = Integer.parseInt(split[2]);
+                if(split[0].equals("A"))
+                {
+                    parkA[n1][n2] = true;
+                    countA++;
+                }
+                else if(split[0].equals("B"))
+                {
+                    parkB[n1][n2] = true;
+                    countB++;
+                }
+                k++;
+            }
+            in.close();
+        } catch (Exception e)
+        {
+            e.getStackTrace();
+        }
+
+        for (int i = 0; i < parkA.length; i++) {
+            for (int j = 0; j < parkA[0].length; j++) {
+                if(!parkA[i][j])
+                    isParkinglotFull = false;
+            }
+        }
+        for (int i = 0; i < parkB.length; i++) {
+            for (int j = 0; j < parkB[0].length; j++) {
+                if(parkB[i][j])
+                    isParkinglotFull = false;
+            }
+        }
+
+        return isParkinglotFull;
+    }
+
+    private void deleteReservationAfterReservationCheck() {
+        // 원래 미예약 입차 고객이라면 입력을 받는 parkingArea를 예약내역에 있는 주차 자리로 갱신해줌.
+
+        System.out.println("Deleteing you reservation since you just visited...");
+        String[] split = clearDateTime.split("/");
+        String getLine;
+        try{
+            File currentTime = new File(split[0] + "/booked.txt");
+
+            File tmpFile = new File(split[0]+ "/tempBook.txt");
+            FileOutputStream streamOutFortmpFile = new FileOutputStream(tmpFile);
+            PrintWriter writerOutFortmpFile = new PrintWriter(streamOutFortmpFile);
+            FileInputStream currentFile = new FileInputStream(split[0]+ "/Booked.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(currentFile));
+
+            while((getLine = br.readLine()) != null){
+                if(getLine.contains(reservedSpot)){
+                    continue;
+                } else {
+                    writerOutFortmpFile.println(getLine);
+                }
+            }
+
+            writerOutFortmpFile.flush();
+            writerOutFortmpFile.close();
+            streamOutFortmpFile.close();
+            br.close();
+            currentTime.delete();
+            //임시파일을 원래 파일명으로 변경
+            tmpFile.renameTo(currentTime);
+            System.out.println("Complete");
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void enterParkingSeat() {
         //올바르게 입력 할때까지 무한루프
         boolean A = true;
@@ -367,17 +474,17 @@ public class Visit {
 
             if(chars[0] == 'A' && parkA[chars[1] - '0'][chars[2] -'0']) //parkA에서 차가 이미 들어가 있는지 확인
             {
-                System.out.println("예약 불가능한 자리입니다.");
+                System.out.println("입차 불가능한 자리입니다.");
                 continue;
             }
             else if(chars[0] == 'B' && parkB[chars[1] - '0'][chars[2] -'0'])  //parkA에서 차가 이미 들어가 있는지 확인
             {
-                System.out.println("예약 불가능한 자리입니다.");
+                System.out.println("입차 불가능한 자리입니다.");
                 continue;
             }
             parkingArea = chars[0] + "-" + chars[1] + "-" + chars[2];
             flag = false;
-            System.out.println("예약 구역 선택이 완료되었습니다.");
+            System.out.println("입차가 완료되었습니다.");
         }
     }
 
@@ -421,7 +528,7 @@ public class Visit {
                 k++;
             }
             in.close();
-        }catch (Exception e)
+        } catch (Exception e)
         {
             e.getStackTrace();
         }
@@ -445,14 +552,6 @@ public class Visit {
             }
             System.out.println();
         }
-
-    }
-
-    private void forcedExit() {
-    }
-
-    private boolean noEmptySeats() {
-        return true;
     }
 
     private void entryCompleted() {
