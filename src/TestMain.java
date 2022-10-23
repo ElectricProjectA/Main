@@ -10,7 +10,8 @@ public class TestMain {
 
         Scanner scan = new Scanner(System.in);
         System.out.println("메뉴를 입력하세요");
-        System.out.print("1)방문 2)예약 3)종료 : ");
+        System.out.println("1)방문 2)예약 3)종료");
+        System.out.print(">>>");
         String menu = scan.next();
         currentTime.setMenuNum(Integer.parseInt(menu));
         currentTime.setting1();

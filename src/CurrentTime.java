@@ -35,7 +35,7 @@ public class CurrentTime {
         Scanner scanner = new Scanner(System.in);
 
         while(true){
-            System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시:2022-9-28/14:00) ");
+            System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시:2022-9-3/14:00) ");
             System.out.print(">>>");
             date_time = scanner.next();
 
@@ -179,41 +179,35 @@ public class CurrentTime {
                     //"2020-10-03/14:01"
                     if(k==0)
                     {
-                        System.out.println("***Test***");
                         String[] split1 = thisLine.split("-|/|:");
                         String[] split2 = date_time.split("-|/|:");
                         boolean flag = true;
 
                         if((Integer.parseInt(split2[0]) < Integer.parseInt(split1[0]))) {
-                            System.out.println("기록된 year 보다 과거입니다");
                             flag = false;
                         } else if ((Integer.parseInt(split2[0]) > Integer.parseInt(split1[0]))) {
                             // 기록시간 이후의 입력 따라서 flag = true
                         } else {
                             // when years are the same
                             if((Integer.parseInt(split2[1]) < Integer.parseInt(split1[1]))) {
-                                System.out.println("기록된 month 보다 과거입니다");
                                 flag = false;
                             } else if ((Integer.parseInt(split2[1]) > Integer.parseInt(split1[1]))) {
                                 // 기록시간 이후의 입력 따라서 flag = true
                             } else {
                                 // when years and months are the same
                                 if((Integer.parseInt(split2[2]) < Integer.parseInt(split1[2]))) {
-                                    System.out.println("기록된 date 보다 과거입니다");
                                     flag = false;
                                 } else if ((Integer.parseInt(split2[2]) > Integer.parseInt(split1[2]))) {
                                     // 기록시간 이후의 입력 따라서 flag = true
                                 } else {
                                     // when years, months and dates are the same
                                     if((Integer.parseInt(split2[3]) < Integer.parseInt(split1[3]))) {
-                                        System.out.println("기록된 time 보다 과거입니다");
                                         flag = false;
                                     } else if ((Integer.parseInt(split2[3]) > Integer.parseInt(split1[3]))) {
                                         // 기록시간 이후의 입력 따라서 flag = true
                                     } else {
                                         // when years, months, dates and times are the same
                                         if((Integer.parseInt(split2[4]) < Integer.parseInt(split1[4]))) {
-                                            System.out.println("기록된 time 보다 과거입니다");
                                             flag = false;
                                         } else if ((Integer.parseInt(split2[4]) >= Integer.parseInt(split1[4]))) {
                                             // 기록시간 이후의 입력 따라서 flag = true

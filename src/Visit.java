@@ -13,6 +13,14 @@ public class Visit {
     private String currentTime;
     private boolean[][] parkA = new boolean[4][4];
     private boolean[][] parkB = new boolean[4][4];
+
+    int input0;
+    int input1;
+    int input2;
+    int input3;
+    int input4;
+
+    String clearDateTime;
     public Visit(String currentTime) {
         this.currentTime = currentTime;
     }
@@ -78,17 +86,31 @@ public class Visit {
         return true;
     }
 
+    String pathname;
+
     private boolean isCarExist() {
         String[] split = currentTime.split("/");
-        //currentTime: 생상자로 받아온 현재 날짜와 시각 / 입력 예시: 2022-9-28/14:00
+        //currentTime: 생상자로 받아온 현재 날짜와 시각
+        // 입력 예시: 2022-9-28/14:00
 
         StringBuffer sb = new StringBuffer();
         FileReader readFile;
         String getLine;
 
+        String[] input = currentTime.split("-|/|:");
+        for(int i=0; i<input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
+        }
+
+        input0 = (int)Double.parseDouble(input[0]);
+        input1 = (int)Double.parseDouble(input[1]);
+        input2 = (int)Double.parseDouble(input[2]);
+        input3 = (int)Double.parseDouble(input[3]);
+        input4 = (int)Double.parseDouble(input[4]);
+
+        clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+        pathname = input0+"-"+input1+"-"+input2;
         try {
-            String date[] = split[0].split("-");
-            String pathname=date[0].replaceFirst("^0+(?!$)", "")+"-"+date[1].replaceFirst("^0+(?!$)", "")+"-"+date[2].replaceFirst("^0+(?!$)", "");
             readFile = new FileReader(pathname + "/visited.txt");
 
             BufferedReader br = new BufferedReader(readFile);
@@ -101,7 +123,6 @@ public class Visit {
                     return false; //차량이 존재하면 false 반환
                 }
             }
-
             br.close();
         } catch(FileNotFoundException e) {
             e.printStackTrace();
@@ -119,7 +140,8 @@ public class Visit {
 
         //1. 차량번호 입력 및 그 차량이 주차장에 존재하는지 확인
         boolean flag = false;
-        while(!flag) {
+        while(!flag)
+        {
             flag = inputCarNum() && isCarExist();
             if(!flag) {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요");
@@ -152,21 +174,18 @@ public class Visit {
 
     private void enterParkingSeat() {
         //올바르게 입력 할때까지 무한루프
-
         boolean A = true;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 A = A && parkA[i][j];
             }
         }
-
         boolean B = true;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 B = B && parkB[i][j];
             }
         }
-
         if(A && B) {
             //parkA와 parkB에 모두 더이상 주차할 자리가 없는 경우
             System.out.println("자리가 모두 꽉차 예약할 수 없습니다.");
@@ -175,11 +194,7 @@ public class Visit {
 
         boolean flag = true;
         while(flag) {
-            System.out.println("Parking lot Status");
-
-            System.out.println("주차할 자리를 선택하세요 (ex>>>A-1-3 // A구역 1행의 3열이라는 뜻)");
-            // print parking lot status
-            System.out.print(">>>");
+            System.out.print("주차할 자리를 선택하세요 (");
             Scanner scan = new Scanner(System.in);
             String area = scan.next();
             String[] split = area.split("-");
@@ -229,56 +244,77 @@ public class Visit {
                 System.out.println("예약 불가능한 자리입니다.");
                 continue;
             }
-
             parkingArea = chars[0] + "-" + chars[1] + "-" + chars[2];
             flag = false;
-            System.out.println("입차 구역 선택이 완료되었습니다.");
+            System.out.println("예약 구역 선택이 완료되었습니다.");
         }
     }
 
     private void printParkingStatus() {
-        System.out.println("Printing parking status...");
-        int howManyCarsinA = 0;
-        for(int i=0; i<4; i++) {
-            for (int j=0; j<4; j++) {
-                if(parkA[i][j]) {
-                    howManyCarsinA++;
-                }
-            }
+        String[] input = currentTime.split("-|/|:");
+        for(int i=0; i<input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
         }
-        System.out.println("A 구역: "+howManyCarsinA+"/16");
 
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                if(parkA[i][j]) {
-                    System.out.print("■");
-                } else {
-                    System.out.print("□");
+        input0 = (int)Double.parseDouble(input[0]);
+        input1 = (int)Double.parseDouble(input[1]);
+        input2 = (int)Double.parseDouble(input[2]);
+        input3 = (int)Double.parseDouble(input[3]);
+        input4 = (int)Double.parseDouble(input[4]);
+
+        clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+        pathname = input0+"-"+input1+"-"+input2;
+        int countA = 0;
+        int countB =0;
+        try{
+            FileInputStream currentFile = new FileInputStream(pathname + "/visited.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
+            String getLine = "";
+            int k=0;
+            while((getLine = in.readLine()) != null)
+            {
+                String[] fullString = getLine.split(" ");
+                String[] split = fullString[0].split("-");
+                int n1 = Integer.parseInt(split[1]);
+                int n2 = Integer.parseInt(split[2]);
+                if(split[0].equals("A"))
+                {
+                    parkA[n1][n2] = true;
+                    countA++;
                 }
+                else if(split[0].equals("B"))
+                {
+                    parkB[n1][n2] = true;
+                    countB++;
+                }
+                k++;
+            }
+            in.close();
+        }catch (Exception e)
+        {
+            e.getStackTrace();
+        }
+        System.out.println("A구역 : " + countA + "/16");
+        for (int i = 0; i < parkA.length; i++) {
+            for (int j = 0; j < parkA[0].length; j++) {
+                if(parkA[i][j])
+                    System.out.print("■ ");
+                else
+                    System.out.print("□ ");
+            }
+            System.out.println();
+        }
+        System.out.println("B구역 : " + countB + "/16");
+        for (int i = 0; i < parkB.length; i++) {
+            for (int j = 0; j < parkB[0].length; j++) {
+                if(parkB[i][j])
+                    System.out.print("■ ");
+                else
+                    System.out.print("□ ");
             }
             System.out.println();
         }
 
-        int howManyCarsinB = 0;
-        for(int i=0; i<4; i++) {
-            for (int j=0; j<4; j++) {
-                if(parkB[i][j]) {
-                    howManyCarsinB++;
-                }
-            }
-        }
-        System.out.println("B 구역: "+howManyCarsinB+"/16");
-
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                if(parkB[i][j]) {
-                    System.out.print("■");
-                } else {
-                    System.out.print("□");
-                }
-            }
-            System.out.println();
-        }
     }
 
     private void forcedExit() {
@@ -290,15 +326,15 @@ public class Visit {
 
     private void entryCompleted() {
 
-        String[] split = currentTime.split("/");
+        String[] split = clearDateTime.split("/");
         String date = split[0];
         int menu = 1;
-        File dir = new File(split[0]);
+        File dir = new File(pathname);
         if(dir.exists())
         {
             try{
-                FileOutputStream fVisited= new FileOutputStream(split[0] + "/visited.txt",true);
-                String fullString = parkingArea + " " + carNum + " " + currentTime +"\n";
+                FileOutputStream fVisited= new FileOutputStream(pathname + "/visited.txt",true);
+                String fullString = parkingArea + " " + carNum + " " + clearDateTime +"\n";
                 fVisited.write(fullString.getBytes());
             }catch (Exception e)
             {
@@ -316,6 +352,7 @@ public class Visit {
     }
 
     private boolean isReserved(){
+
         System.out.println("Checking if you've made a reservation");
         System.out.println("test default is false");
         return false;
@@ -326,6 +363,33 @@ public class Visit {
     // carOut 구역 시작==========================================
     private void carOut(){
         boolean flag = false;
+        String[] input = currentTime.split("-|/|:");
+        for(int i=0; i<input.length; i++) {
+            input[i] = input[i].replaceFirst("^0+(?!$)", "");
+        }
+
+        input0 = (int)Double.parseDouble(input[0]);
+        input1 = (int)Double.parseDouble(input[1]);
+        input2 = (int)Double.parseDouble(input[2]);
+        input3 = (int)Double.parseDouble(input[3]);
+        input4 = (int)Double.parseDouble(input[4]);
+
+        clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+        pathname = input0+"-"+input1+"-"+input2;
+
+        try{
+            FileInputStream currentFile = new FileInputStream(pathname + "/visited.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
+            if(in.readLine() == null)
+            {
+                System.out.println("주차장이 모두 비어있습니다. 출차 하실 수 없습니다.");
+                System.exit(0);
+            }
+            in.close();
+        }catch (Exception e)
+        {
+            e.getStackTrace();
+        }
         while(!flag)
         {
             flag = inputCarNum() && !isCarExist(); //형식이 올바르고 현재 주차중인 차량이라면
@@ -342,9 +406,43 @@ public class Visit {
 
     private void exitCompleted() {
         //visited 텍스트 파일에서 해당 차량 번호 찾아서 없애야함
+
+        String[] split = clearDateTime.split("/");
+
+        String getLine;
+        try{
+            File currentTime = new File(split[0] + "/visited.txt");
+            File tmpFile = new File(split[0]+ "/$$$$$$$$.txt");
+            FileOutputStream fout = new FileOutputStream(tmpFile);
+            PrintWriter out = new PrintWriter(fout);
+            FileInputStream currentFile = new FileInputStream(split[0]+ "/visited.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(currentFile));
+
+            while((getLine = br.readLine()) != null){
+                String line;
+
+                if(getLine.contains(carNum))
+                    continue;
+                out.println(getLine);
+
+            }
+            out.flush();
+            out.close();
+            fout.close();
+            br.close();
+            currentTime.delete();
+            //임시파일을 원래 파일명으로 변경
+            tmpFile.renameTo(currentTime);
+
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
+
+
+}
     // carOut 구역 끝==========================================
 
 
 
-}
+
