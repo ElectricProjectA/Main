@@ -182,6 +182,7 @@ public class Visit {
             } else {
                 entryCompleted();
             }
+            deleteReservationAfterReservationCheck();
         } else {
             //미예약 고객
             printParkingStatus();
@@ -449,6 +450,40 @@ public class Visit {
             //임시파일을 원래 파일명으로 변경
             tmpFile.renameTo(currentTime);
 
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteReservationAfterReservationCheck() {
+        System.out.println("Deleteing you reservation since you just visited...");
+        String[] split = clearDateTime.split("/");
+        String getLine;
+        try{
+            File currentTime = new File(split[0] + "/booked.txt");
+
+            File tmpFile = new File(split[0]+ "/tempBook.txt");
+            FileOutputStream streamOutFortmpFile = new FileOutputStream(tmpFile);
+            PrintWriter writerOutFortmpFile = new PrintWriter(streamOutFortmpFile);
+            FileInputStream currentFile = new FileInputStream(split[0]+ "/Booked.txt");
+            BufferedReader br = new BufferedReader(new InputStreamReader(currentFile));
+
+            while((getLine = br.readLine()) != null){
+                if(getLine.contains(reservedSpot)){
+                    continue;
+                } else {
+                    writerOutFortmpFile.println(getLine);
+                }
+            }
+
+            writerOutFortmpFile.flush();
+            writerOutFortmpFile.close();
+            streamOutFortmpFile.close();
+            br.close();
+            currentTime.delete();
+            //임시파일을 원래 파일명으로 변경
+            tmpFile.renameTo(currentTime);
+            System.out.println("Complete");
         }catch(IOException e){
             e.printStackTrace();
         }
