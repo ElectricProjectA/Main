@@ -34,7 +34,7 @@ public class CurrentTime {
 
     public void setting1(){
         readtxt();
-        //noShowHandling();
+        noShowHandling();
     }
 
     private void enterCurrentTime() {

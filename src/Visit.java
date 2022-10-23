@@ -116,11 +116,18 @@ public class Visit {
             BufferedReader br = new BufferedReader(readFile);
 
             while((getLine = br.readLine()) != null) {
-                //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작
-                String[] txtSplit = getLine.split(" "); //공백으로 구분
-                if(txtSplit[1].contains(carNum)) {
-                    System.out.println(carNum + "차량은 현재 주차되어있는 차량입니다.");
-                    return false; //차량이 존재하면 false 반환
+                //visited.txt  첫줄부터 읽기 시작
+                if(getLine.split(" ").equals("\n")) {
+                    //만약 visited.txt에 공백으로만 된 줄이 있으면 무시하고 다음줄 읽기
+                    //.......로 하는게 목적이었는데 if조건문 안에 뭘 넣어야하는지 모르겠음. 공백줄 없으면 에러는 안남.
+                    // (getLine.replaceFirst(" \n", "") == "") ??
+                    continue;
+                } else {
+                    String[] txtSplit = getLine.split(" "); //공백으로 구분
+                    if(txtSplit[1].contains(carNum)) {
+                        System.out.println(carNum + "차량은 현재 주차되어있는 차량입니다.");
+                        return false; //차량이 존재하면 false 반환
+                    }
                 }
             }
             br.close();
@@ -240,8 +247,10 @@ public class Visit {
             e.printStackTrace();
         }
         //System.out.println("isCarReserved: "+isCarReserved);
+        System.out.println("Complete");
         return isCarReserved;
     }
+
     private boolean isReservedSeatOccupied()
     {
         System.out.println("Checking if the spot is occupied...");
@@ -432,7 +441,8 @@ public class Visit {
 
         boolean flag = true;
         while(flag) {
-            System.out.print("주차할 자리를 선택하세요 : ");
+            System.out.println("주차할 자리를 선택하세요 (ex>>>A-1-3)");
+            System.out.print(">>>");
             Scanner scan = new Scanner(System.in);
             String area = scan.next();
             String[] split = area.split("-");
