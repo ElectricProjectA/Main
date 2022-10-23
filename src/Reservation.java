@@ -43,18 +43,26 @@ public class Reservation {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요");
         }
 
-        printParkingStatus();//예약 가능한 자리면 true 불가능한 자리면 false 로 2차원 배열 parkA,park B 에 저장해주세용
-        enterParkingSeat(); //주차를 원하는 자리 입력
-        if(inputCarNum()) { //올바른 형식으로 입력했는지 확인
-            if(isAlreadyReserved()) //이미 예약한 차량인지 확인
-            {
-                System.out.println("이미 예약하셨습니다");
-                System.exit(0);
-            }
-            else
-            {
-                reservationCompleted();
-                System.out.println("예약이 완료되었습니다.");
+
+
+        boolean isNotOk = true;
+        while(isNotOk)
+        {
+            printParkingStatus();//예약 가능한 자리면 true 불가능한 자리면 false 로 2차원 배열 parkA,park B 에 저장해주세용
+            enterParkingSeat(); //주차를 원하는 자리 입력
+            if(inputCarNum()) { //올바른 형식으로 입력했는지 확인
+
+                isNotOk = isAlreadyReserved();
+                if(isNotOk)
+                {
+                    System.out.println("이미 예약되어있습니다. 다시 입력하세요");
+                }
+                else
+                {
+                    isNotOk = false;
+                    reservationCompleted();
+                    System.out.println("예약이 완료되었습니다.");
+                }
             }
         }
 
@@ -225,7 +233,7 @@ public class Reservation {
 
     private void printParkingStatus() throws ParseException {
         // 예약 날짜에 대한 현황만 출력하면 됨
-        String[] input = currentTime.split("-|/|:");
+        String[] input = clearReservationTime.split("-|/|:");
         for(int i=0; i<input.length; i++) {
             input[i] = input[i].replaceFirst("^0+(?!$)", "");
         }
