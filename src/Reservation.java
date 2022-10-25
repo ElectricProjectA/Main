@@ -480,14 +480,18 @@ public class Reservation {
                     }else if(currmonth<rinput1&& (date-currday+rinput2) > 3){
                         System.out.println("3일 이후는 예약할 수 없습니다.");
                         continue;
-                    }else {//pppppppppppppp
+                    }else if(currmonth==rinput1&& rinput2 - currday > 3)
+                    {
+                        System.out.println("3일 이후는 예약할 수 없습니다.");
+                        continue;
+                    } else {
                         // when years, months and dates are the same
-                        if(currday > rinput2 && (Integer.parseInt(currentTime[3]) > rinput3)) {
+                        if((Integer.parseInt(currentTime[3]) > rinput3)) {
                             System.out.println("기록된 time 보다 과거입니다");
                             continue;
                         }else {
                             // when years, months, dates and times are the same
-                            if((Integer.parseInt(currentTime[3]) > rinput3) && (Integer.parseInt(currentTime[4]) > rinput4)) {
+                            if((Integer.parseInt(currentTime[4]) > rinput4)) {
                                 System.out.println("기록된 time 보다 과거입니다");
                                 continue;
                             }
@@ -496,7 +500,6 @@ public class Reservation {
                 }
             }
 
-
             if(rinput1 > 12){
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
@@ -504,13 +507,7 @@ public class Reservation {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
-            if(Integer.parseInt(currentTime[0]) == rinput0 )
-            {
-                clearReservationTime = rinput0+"-"+rinput1+"-"+rinput2+"/"+rinput3+":"+rinput4;
 
-                break;
-
-            }
             if(rinput1==1 || rinput1==3 || rinput1==5 || rinput1==7 || rinput1==8 || rinput1==10 || rinput1==12){
                 if(rinput2<1){
                     System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
@@ -557,7 +554,7 @@ public class Reservation {
 
             clearReservationTime = rinput0+"-"+rinput1+"-"+rinput2+"/"+rinput3+":"+rinput4;
 
-           
+
             String[] split = clearReservationTime.split("/");
             File reserveFile = new File(split[0]);
             try {

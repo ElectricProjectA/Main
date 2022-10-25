@@ -31,9 +31,30 @@ public class Visit {
             System.out.println("주차장 운영 시간이 아닙니다.");
             return;
         }
-        System.out.println("1)입차 2)출차");
-        System.out.print(">>>");
-        int menu = scan.nextInt();
+
+
+        int menu =0;
+        boolean flag = true;
+        while(flag)
+        {
+            System.out.println("1)입차 2)출차");
+            System.out.print(">>>");
+            String menuS = scan.nextLine();
+            String[] split = menuS.split("");
+
+            if(split.length != 1)
+            {
+                System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
+                continue;
+            }
+
+            if(split[0].equals("1") || split[0].equals("2"))
+            {
+                menu = Integer.parseInt(split[0]);
+                break;
+            }
+            System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
+        }
 
         switch (menu){
             case 1:
@@ -57,7 +78,8 @@ public class Visit {
         while(true) { //올바른 형식을 입력할 때까지 while문 무한반복
             System.out.println("차량 번호를 입력하세요 ex)123-가-1234");
             System.out.print(">>>");
-            carNum = scan.next();
+
+            carNum = scan.nextLine();
             int hyphenNum = carNum.length() - carNum.replace("-","").length();
             String[] carNumPiece = carNum.split("-");
             if(!(carNumPiece.length == 3 && hyphenNum == 2)) {
@@ -302,7 +324,7 @@ public class Visit {
         System.out.println("Checking if the spot is occupied...");
         boolean isReservedSeatOccupied = false;
 
-       String[] split = currentTime.split("/");
+        String[] split = currentTime.split("/");
 
         StringBuffer sb = new StringBuffer();
         FileReader readFile;
@@ -494,6 +516,7 @@ public class Visit {
             Scanner scan = new Scanner(System.in);
             String area = scan.next();
             String[] split = area.split("-");
+
             if(area.charAt(area.length()-1) == '-')
             {
                 System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
@@ -504,7 +527,11 @@ public class Visit {
                 System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
                 continue;
             }
-            char[]  chars = new char[3];
+            if(split[0].length() < 1 || split[1].length() < 1 || split[2].length() < 1){
+                System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
+                continue;
+            }
+            char[] chars = new char[3];
             boolean tooLong = false;
             for (int i = 0; i < 3; i++) {
                 if(split[i].length()>1) // AA, 1.2 같이 각 구분자 사이 길이 2 이상이면 짜름
@@ -729,7 +756,9 @@ public class Visit {
 
 
 }
-    // carOut 구역 끝==========================================
+// carOut 구역 끝==========================================
+
+
 
 
 
