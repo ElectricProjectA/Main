@@ -8,8 +8,11 @@ public class TestMain {
         CurrentTime currentTime = new CurrentTime();
         currentTime.setting();
         String date_time = currentTime.getDateTime();
-        boolean flag = true;
+        MemberManagement memberManagement = new MemberManagement();
+        String memberId = memberManagement.registerMember();
 
+
+        boolean flag = true;
         while(true){
             Scanner scan = new Scanner(System.in);
 
@@ -38,19 +41,17 @@ public class TestMain {
                 System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
             }
 
-
-
             currentTime.setMenuNum(menu);
             currentTime.setting1();
             switch (menu) {
                 case 1:
                     //방문()
-                    Visit visit = new Visit(date_time);
+                    Visit visit = new Visit(date_time,memberId);
                     visit.menu();
                     flag = false;
                     break;
                 case 2:
-                    Reservation reserve = new Reservation(date_time);
+                    Reservation reserve = new Reservation(date_time,memberId);
                     reserve.reservation();
                     flag = false;
                     break;

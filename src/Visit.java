@@ -8,6 +8,7 @@ public class Visit {
 
     private String parkingArea = "";
     Scanner scan = new Scanner(System.in);
+    String memberId;
     private String reservedSpot; // isReservedUser()에서 씀.
     private String carNum; // for license plate number
     private String currentTime;
@@ -21,8 +22,9 @@ public class Visit {
     int input3;
     int input4;
 
-    public Visit(String currentTime) {
+    public Visit(String currentTime, String memberId) {
         this.currentTime = currentTime;
+        this.memberId = memberId;
     }
 
     public void menu()
