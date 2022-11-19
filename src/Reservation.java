@@ -31,13 +31,21 @@ public class Reservation {
     int reservationHour;
     int reservationMinute;
     String reservationTime;
+
     public Reservation(String currentTime,String memberId) {
         this.currentTime = currentTime;
         this.memberId = memberId;
     }
+    MemberManagement memberManagement ;
 
     public void reservation() throws ParseException
     {
+        //blacklist에 있는 회원인지 확인
+        if(isOnBlacklist()) {
+            System.out.println("예약 서비스가 제한된 회원입니다.");
+            System.exit(0);
+        }
+
         boolean flag = false;
         while(!flag)
         {
@@ -54,21 +62,46 @@ public class Reservation {
             if(inputCarNum()) { //올바른 형식으로 입력했는지 확인
 
                 isNotOk = isAlreadyReserved();
-                if(isNotOk)
-                {
+                if(isNotOk) {
                     System.out.println("이미 예약되어있습니다. 다시 입력하세요");
                 }
-                else
-                {
+                else {
                     isNotOk = false;
                     reservationCompleted();
                     System.out.println("예약이 완료되었습니다.");
                 }
             }
         }
-
-
     }
+
+    private boolean isOnBlacklist() {
+        File blacklistTxt = new File("blacklist.txt");
+
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+        try {
+            if (!blacklistTxt.exists())
+                blacklistTxt.createNewFile();
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+        try {
+            readFile = new FileReader(blacklistTxt);
+            BufferedReader br = new BufferedReader(readFile);
+
+            while ((getLine = br.readLine()) != null) {
+                if (getLine.contains(memberId)) {
+                    return true;
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private void enterParkingSeat() { //올바르게 입력 할때까지 무한루프
         boolean A = true;
         for (int i = 0; i < 4; i++) {
@@ -186,6 +219,15 @@ public class Reservation {
         String[] split = clearReservationTime.split("/");
         int menu = 1;
         File dir = new File(split[0]);
+
+        //사용자가 새로운 차량을 등록하는 경우 사용자 정보(전화번호, 차량번호)를 User.txt에 저장
+        memberManagement = new MemberManagement(memberId);
+        if(!memberManagement.addNewCarToMember(carNum)) {
+            //신규 차량 등록
+            System.out.println("신규 차량을 등록합니다.");
+        }
+
+        //예약정보(예약위치, 차량번호, 예약시간)를 booked.txt에 저장
         if(dir.exists())
         {
             try{
@@ -197,6 +239,7 @@ public class Reservation {
                 e.printStackTrace();
             }
         }
+
 
 
     }
