@@ -42,7 +42,7 @@ public class TestMain {
             }
 
             currentTime.setMenuNum(menu);
-            currentTime.setting1();
+            currentTime.noShowHandling();
             switch (menu) {
                 case 1:
                     //방문()

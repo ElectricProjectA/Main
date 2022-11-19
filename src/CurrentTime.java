@@ -5,7 +5,7 @@ public class CurrentTime {
     String[] splitToDateAndTime;
 
     int yearInput, monthInput, dateInput, hourInput, minuteInput;
-    int menuNum;
+
     String userDateTimeInput;
 
     File reservation;
@@ -23,15 +23,6 @@ public class CurrentTime {
 
     public String getUserDateTimeInput() {
         return userDateTimeInput;
-    }
-
-    public void setMenuNum(int menuNum){
-        this.menuNum = menuNum;
-    }
-
-    public void setting1() {
-        readtxt();
-        noShowHandling();
     }
 
     private void getCurrentTimeInputAndSaveToTimeLog() {
@@ -195,39 +186,44 @@ public class CurrentTime {
                     if(lineCounter == 0)
                     {
                         String[] timeLogDateTimeSplittedToNumbers = thisLine.split("-|/|:");
+                        int yearInTimeLog = Integer.parseInt(timeLogDateTimeSplittedToNumbers[0]);
+                        int monthInTimeLog = Integer.parseInt(timeLogDateTimeSplittedToNumbers[1]);
+                        int dateInTimeLog = Integer.parseInt(timeLogDateTimeSplittedToNumbers[2]);
+                        int hourInTimeLog = Integer.parseInt(timeLogDateTimeSplittedToNumbers[3]);
+                        int minuteInTimeLog = Integer.parseInt(timeLogDateTimeSplittedToNumbers[4]);
 
-                        if((yearInput < Integer.parseInt(timeLogDateTimeSplittedToNumbers[0]))) {
+                        if(yearInput < yearInTimeLog) {
                             System.out.println("기록된 year 보다 과거입니다");
                             isUserInputTimeHasPassed = true;
-                        } else if (yearInput > Integer.parseInt(timeLogDateTimeSplittedToNumbers[0])) {
+                        } else if (yearInput > yearInTimeLog) {
                             // 기록시간 이후의 입력 따라서 flag = true
                         } else {
                             // when years are the same
-                            if(monthInput < Integer.parseInt(timeLogDateTimeSplittedToNumbers[1])) {
+                            if(monthInput < monthInTimeLog) {
                                 System.out.println("기록된 month 보다 과거입니다");
                                 isUserInputTimeHasPassed = true;
-                            } else if (monthInput > Integer.parseInt(timeLogDateTimeSplittedToNumbers[1])) {
+                            } else if (monthInput > monthInTimeLog) {
                                 // 기록시간 이후의 입력 따라서 flag = true
                             } else {
                                 // when years and months are the same
-                                if(dateInput < Integer.parseInt(timeLogDateTimeSplittedToNumbers[2])) {
+                                if(dateInput < dateInTimeLog) {
                                     System.out.println("기록된 date 보다 과거입니다");
                                     isUserInputTimeHasPassed = true;
-                                } else if (dateInput > Integer.parseInt(timeLogDateTimeSplittedToNumbers[2])) {
+                                } else if (dateInput > dateInTimeLog) {
                                     // 기록시간 이후의 입력 따라서 flag = true
                                 } else {
                                     // when years, months and dates are the same
-                                    if(hourInput < Integer.parseInt(timeLogDateTimeSplittedToNumbers[3])) {
+                                    if(hourInput < hourInTimeLog) {
                                         System.out.println("기록된 time 보다 과거입니다");
                                         isUserInputTimeHasPassed = true;
-                                    } else if (hourInput > Integer.parseInt(timeLogDateTimeSplittedToNumbers[3])) {
+                                    } else if (hourInput > hourInTimeLog) {
                                         // 기록시간 이후의 입력 따라서 flag = true
                                     } else {
                                         // when years, months, dates and times are the same
-                                        if(minuteInput < Integer.parseInt(timeLogDateTimeSplittedToNumbers[4])) {
+                                        if(minuteInput < minuteInTimeLog) {
                                             System.out.println("기록된 time 보다 과거입니다");
                                             isUserInputTimeHasPassed = true;
-                                        } else if (minuteInput == Integer.parseInt(timeLogDateTimeSplittedToNumbers[4])) {
+                                        } else if (minuteInput == minuteInTimeLog) {
                                             System.out.println("기록된 time 보다 과거입니다");
                                             isUserInputTimeHasPassed = true;
                                         }
@@ -273,9 +269,6 @@ public class CurrentTime {
     public void createVisitedAndBookedTxt(){
         //파일 생성
         splitToDateAndTime = userDateTimeInputInFormat.split("/");
-        // String currentDirectoryPath = System.getProperty("user.dir"); - 현재 파일 경로 가져오기 - never used
-        //Path directoryPath = Paths.get(path+ "\\" + split[0]); // Main 아래에 현재 날짜로 폴더 생성
-        // String date[] = dateAndTimeSplitted[0].split("-"); - never used
 
         File dateNamedFolder = new File(splitToDateAndTime[0]);
         if(!dateNamedFolder.exists())
@@ -296,61 +289,29 @@ public class CurrentTime {
         }
     }
 
-    public void readtxt(){
-        StringBuffer readTxtStringBuffer = new StringBuffer();
-        FileReader readFile;
-        String getLine;
-
-        String date[] = splitToDateAndTime[0].split("-");
-        try{
-            if(menuNum==1){
-                readFile = new FileReader(splitToDateAndTime[0]+ "/visited.txt");
-            }else{
-                readFile = new FileReader(splitToDateAndTime[0]+ "/booked.txt");
-            }
-
-            BufferedReader br = new BufferedReader(readFile);
-
-            while((getLine = br.readLine()) != null){
-
-                if(getLine.contains("123가1234")){
-                    System.out.println(getLine);
-                    String[] info = getLine.split(" ");
-                }
-            }
-            br.close();
-        } catch(IOException e){
-            e.printStackTrace();
-        }
-    }
-
-    private void noShowHandling() {
+    public void noShowHandling() {
         //현재시간 입력받으면
         //2시간이내 입차하지 않으면 노쇼
         //주차구역-차량번호-예약시간 인데 예약시간+2<현재시간이면 노쇼
 
-        // String date[] = dateAndTimeSplitted[0].split("-"); // never used
-
         String yearMonthDateHyphenated = splitToDateAndTime[0]; //날짜
         String hourMinuteHyphenated = splitToDateAndTime[1]; //시간
 
-        String[] standardTimesplit = hourMinuteHyphenated.split(":"); //시간, 분 따로
+        String[] hourAndMinute = hourMinuteHyphenated.split(":"); //시간, 분 따로
 
         String getLine;
         try{
-            // File currentBooked = reservation; // never used
-            File tmpFile = new File(yearMonthDateHyphenated+ "/$$$$$$$$.txt");
-            FileOutputStream tmpFileFout = new FileOutputStream(tmpFile);
+            File tmpReservationListFile = new File(yearMonthDateHyphenated+ "/tmpReservationList.txt");
+            FileOutputStream tmpFileFout = new FileOutputStream(tmpReservationListFile);
             PrintWriter out = new PrintWriter(tmpFileFout);
             FileInputStream currentFile = new FileInputStream(yearMonthDateHyphenated+ "/booked.txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(currentFile));
 
             while((getLine = br.readLine()) != null){
-                String line;
                 String[] bookedInfo = getLine.split(" |:|/");
 
                 //A-3-1 123-가-1234 2022-7-22/15:00
-                if((Integer.parseInt(standardTimesplit[0])*60+Integer.parseInt(standardTimesplit[1]))-(Integer.parseInt(bookedInfo[3])*60+Integer.parseInt(bookedInfo[4]))>120){
+                if((Integer.parseInt(hourAndMinute[0])*60+Integer.parseInt(hourAndMinute[1]))-(Integer.parseInt(bookedInfo[3])*60+Integer.parseInt(bookedInfo[4]))>120){
 
                     System.out.println(bookedInfo[1]+"차량의 노쇼처리가 완료되었습니다.");
                     continue;
@@ -363,8 +324,7 @@ public class CurrentTime {
             tmpFileFout.close();
             br.close();
             reservation.delete();
-            //임시파일을 원래 파일명으로 변경
-            tmpFile.renameTo(reservation);
+            tmpReservationListFile.renameTo(reservation);
 
         }catch(IOException e){
             e.printStackTrace();
