@@ -164,8 +164,8 @@ public class CurrentTime {
 
             try {
                 String log = "\n" +userDateTimeInput;
-                //파일에서 읽은 한라인을 저장하는 임시변수
-                String thisLine = "";
+
+                String readLineFromFile = "";
 
                 // 새 로그가 저장될 임시파일 생성
                 File tmpTimeLogFile = new File("tmpTimelog.txt");
@@ -181,11 +181,11 @@ public class CurrentTime {
                 //파일 내용을 한라인씩 읽어 삽입될 라인이 오면 문자열을 삽입
                 int lineCounter =0;
                 boolean isUserInputTimeHasPassed = false;
-                while ((thisLine = timeLogBufferedReader.readLine()) != null) {
+                while ((readLineFromFile = timeLogBufferedReader.readLine()) != null) {
                     //"2020-10-03/14:01"
                     if(lineCounter == 0)
                     {
-                        String[] timeLogDateTimeSplittedToNumbers = thisLine.split("-|/|:");
+                        String[] timeLogDateTimeSplittedToNumbers = readLineFromFile.split("-|/|:");
                         int yearInTimeLog = Integer.parseInt(timeLogDateTimeSplittedToNumbers[0]);
                         int monthInTimeLog = Integer.parseInt(timeLogDateTimeSplittedToNumbers[1]);
                         int dateInTimeLog = Integer.parseInt(timeLogDateTimeSplittedToNumbers[2]);
@@ -239,7 +239,7 @@ public class CurrentTime {
                             break;
                         }
                     }
-                    tmpTimeLogPrintWriter.println(thisLine);
+                    tmpTimeLogPrintWriter.println(readLineFromFile);
                     lineCounter++;
                 } // while 구문 끝
 
@@ -248,7 +248,7 @@ public class CurrentTime {
                     continue;
                 }
 
-                if(thisLine == null && lineCounter == 0) {
+                if(readLineFromFile == null && lineCounter == 0) {
                     tmpTimeLogPrintWriter.println(userDateTimeInputInFormat);
                 }
 
