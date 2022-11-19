@@ -15,12 +15,11 @@ public class Reservation {
     private boolean[][] parkB = new boolean[4][4];
     //printParkingStatus()에서, parkA와 parkB에 txt파일로부터 주차 정보를 가져와 저장함
     //parkA[i][j] = true면 주차된 자리, false이면 주차 가능한 자리
+    private String memberId;
     private String reservationArea = ""; //주차한 위치
     private String pathName;
     private String clearReservationTime;
     private String resTime;
-
-
     int currentYear;
     int currentMonth;
     int currentDate;
@@ -32,8 +31,9 @@ public class Reservation {
     int reservationHour;
     int reservationMinute;
     String reservationTime;
-    public Reservation(String currentTime) {
+    public Reservation(String currentTime,String memberId) {
         this.currentTime = currentTime;
+        this.memberId = memberId;
     }
 
     public void reservation() throws ParseException
