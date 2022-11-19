@@ -1,7 +1,5 @@
-import java.nio.Buffer;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.io.*;
 
 public class Visit {
@@ -16,6 +14,7 @@ public class Visit {
     private boolean[][] parkA = new boolean[4][4];
     private boolean[][] parkB = new boolean[4][4];
 
+    String pathname;
     int input0;
     int input1;
     int input2;
@@ -26,6 +25,7 @@ public class Visit {
         this.currentTime = currentTime;
         this.memberId = memberId;
     }
+    MemberManagement memberManagement ;
 
     public void menu()
     {
@@ -37,6 +37,9 @@ public class Visit {
 
         int menu =0;
         boolean flag = true;
+
+        makePathname();
+
         while(flag)
         {
             System.out.println("1)입차 2)출차");
@@ -50,11 +53,20 @@ public class Visit {
                 continue;
             }
 
-            if(split[0].equals("1") || split[0].equals("2"))
-            {
+            //split[0]: 선택한 메뉴
+            if(split[0].equals("1")) {
+                //해당 회원의 차량이 주차 중인지 user.txt파일 확인
+                //주차 중이면 다시 입차 출차 메뉴 선택으로 돌아감
+                if(isAlreadyParked())
+                    continue;
                 menu = Integer.parseInt(split[0]);
                 break;
             }
+            else if (split[0].equals("2")) {
+                menu = Integer.parseInt(split[0]);
+                break;
+            }
+
             System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
         }
 
@@ -69,6 +81,7 @@ public class Visit {
                 break;
         }
     }
+
 
     private boolean isOpen() {
         System.out.println();
@@ -110,17 +123,8 @@ public class Visit {
         return true;
     }
 
-    String pathname;
-
-    private boolean isCarExist() {
-        String[] split = currentTime.split("/");
-        //currentTime: 생상자로 받아온 현재 날짜와 시각
-        // 입력 예시: 2022-9-28/14:00
-
-        StringBuffer sb = new StringBuffer();
-        FileReader readFile;
-        String getLine;
-
+    private void makePathname() {
+        //전역변수로 선언된 pathname 생성. pathname은 현재 날짜와 시간 정보를 저장
         String[] input = currentTime.split("-|/|:");
         for(int i=0; i<input.length; i++) {
             input[i] = input[i].replaceFirst("^0+(?!$)", "");
@@ -134,9 +138,19 @@ public class Visit {
 
         clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
         pathname = input0+"-"+input1+"-"+input2;
+    }
+
+    private boolean isCarExist() {
+        //String[] split = currentTime.split("/");
+        //currentTime: 생상자로 받아온 현재 날짜와 시각
+        // 입력 예시: 2022-9-28/14:00
+
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+
         try {
             readFile = new FileReader(pathname + "/visited.txt");
-
             BufferedReader br = new BufferedReader(readFile);
 
             while((getLine = br.readLine()) != null) {
@@ -178,9 +192,16 @@ public class Visit {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요");
             }
         }
-        System.out.println("차량 번호 확인이 완료되었습니다. 예약 여부 확인 단계로 넘어갑니다.");
+        System.out.println("차량 번호 확인이 완료되었습니다.");
 
-        //2. 예약 고객인지 확인
+        //2. 해당 회원 정보에 등록된 차량인지 확인
+        memberManagement = new MemberManagement(memberId);
+        if(!memberManagement.addNewCarToMember(carNum)) {
+            //신규 차량 등록
+            System.out.println("신규 차량을 등록합니다.");
+        }
+
+        //3. 예약 고객인지 확인
         if(isReservedUser()) {
             // when user have reserved
             if(isReservedSeatOccupied()) {
@@ -239,6 +260,47 @@ public class Visit {
             enterParkingSeat();
             entryCompleted();//이게 txt 넣는 곳
         }
+    }
+
+
+    private boolean isAlreadyParked() {
+        //파일 읽기
+        FileReader readFile;
+        String getLine;
+
+        String[] memberCarNumList = {};
+        try {
+            //1. user.txt에서 사용자의 차량 저장
+            readFile = new FileReader("User.txt");
+            BufferedReader br = new BufferedReader(readFile);
+
+            while ((getLine = br.readLine()) != null) {
+                if (getLine.contains(memberId)) {
+                    memberCarNumList = getLine.split(" ");
+                    break;
+                }
+            }
+
+            //2. 오늘 날짜에 해당하는 텍스트파일에서 해당 차량이 있는지 확인
+            readFile = new FileReader(pathname + "/visited.txt");
+            br.close();
+            br = new BufferedReader(readFile);
+
+            while ((getLine = br.readLine()) != null) {
+                for (int i = 1; i < memberCarNumList.length; i++) {
+                    if (getLine.contains(memberCarNumList[i])) {
+                        System.out.println("회원님의 차량이 이미 주차 중입니다.");
+                        br.close();
+                        return true;
+                    }
+                }
+            }
+            br.close();
+            System.out.println("주차중인 회원님의 차량이 없습니다. 다음 단계로 이동합니다.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private String occupyingVisiter() {

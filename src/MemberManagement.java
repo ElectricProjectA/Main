@@ -1,9 +1,19 @@
 import java.io.*;
+
 import java.util.Scanner;
+
 
 public class MemberManagement {
 
     private String memberId;
+
+    public MemberManagement() {
+    }
+
+    public MemberManagement(String memberId) {
+        this.memberId = memberId;
+    }
+
     public String registerMember() {
 
         Scanner scan = new Scanner(System.in);
@@ -46,8 +56,7 @@ public class MemberManagement {
             int k = 0;
             boolean isRegisteredMember = false;
             while ((thisLine = in.readLine()) != null) {
-                //"2020-10-03/14:01"
-                if(thisLine.equals(memberId))
+                if(thisLine.contains(memberId))
                     isRegisteredMember = true;
                 out.println(thisLine);
                 k++;
@@ -113,7 +122,50 @@ public class MemberManagement {
 
     }
 
-    public void addNewCarToMember() {
+    public boolean addNewCarToMember(String carNum) {
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+        File userTxt = new File("User.txt");
+        try {
+            // 기존 파일
+            FileInputStream currentFile = new FileInputStream(userTxt);
+            BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
+            //파일에서 읽은 한라인을 저장하는 임시변수
+            // 새 로그가 저장될 임시파일 생성
+            File tmpFile = new File("aaaaaaaaaaa.txt");
+            // output 파일
+            FileOutputStream fout = new FileOutputStream(tmpFile);
+            PrintWriter out = new PrintWriter(fout);
 
+            while ((getLine = in.readLine()) != null) {
+                if (getLine.contains(memberId)) {
+                    String[] infoSplit = getLine.split(" ");
+                    if(getLine.contains(carNum))
+                    {
+                        System.out.println("이미 회원에 등록된 차량입니다. 환영합니다.");
+                        out.println(getLine);
+                    }
+                    else
+                    {
+                        String newCarListForMember = getLine +" "+ carNum;
+                        out.println(newCarListForMember);
+
+                    }
+
+                }
+                else
+                    out.println(getLine);
+            }
+            out.flush();
+            out.close();
+            in.close();
+            userTxt.delete();
+            //임시파일을 원래 파일명으로 변경
+            tmpFile.renameTo(userTxt);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }
