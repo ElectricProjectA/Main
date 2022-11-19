@@ -1,11 +1,10 @@
-import java.nio.Buffer;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.io.*;
 
 public class Visit {
 
+    MemberManagement memberManagement = new MemberManagement();
     private String parkingArea = "";
     Scanner scan = new Scanner(System.in);
     String memberId;
@@ -189,11 +188,9 @@ public class Visit {
         System.out.println("차량 번호 확인이 완료되었습니다.");
 
         //2. 해당 회원 정보에 등록된 차량인지 확인
-        if(!isAlreadyRegisteredCar()) {
+        if(!memberManagement.addNewCarToMember(carNum)) {
             //신규 차량 등록
             System.out.println("신규 차량을 등록합니다.");
-            //user.txt에서 memberId를 찾아서 그 줄의 마지막에 차량 신규 등록
-
         }
 
         //3. 예약 고객인지 확인
@@ -257,32 +254,7 @@ public class Visit {
         }
     }
 
-    private boolean isAlreadyRegisteredCar() {
-        StringBuffer sb = new StringBuffer();
-        FileReader readFile;
-        String getLine;
 
-        try {
-            readFile = new FileReader("user.txt");
-            BufferedReader br = new BufferedReader(readFile);
-
-            while ((getLine = br.readLine()) != null) {
-                if (getLine.contains(memberId)) {
-                    String[] infoSplit = getLine.split(" ");
-                    for(int i = 1; i < infoSplit.length; i++) {
-                        if (infoSplit[i].equals(carNum)) {
-                            System.out.println("이미 회원 차량으로 등록된 차량입니다. 예약 여부 확인 단계로 넘어갑니다.");
-                            return true;
-                        }
-                    }
-                }
-            }
-            br.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
     private boolean isAlreadyParked() {
         //파일 읽기
         StringBuffer sb = new StringBuffer();
