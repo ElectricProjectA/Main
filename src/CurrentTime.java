@@ -4,29 +4,23 @@ import java.util.Scanner;
 public class CurrentTime {
     String[] split;
     int menuNum;
-    String date_time;
+    String userDateTimeInput;
 
     File reservation;
 
-    int input0;
-    int input1;
-    int input2;
-    int input3;
-    int input4;
-    String clearDateTime;
+    String userDateTimeInputInFormat;
 
     public CurrentTime() {
 
     }
 
     public void setting() {
-        enterCurrentTime();
+        getCurrentTimeInput();
         createtxt();
     }
 
-    public String getDateTime() {
-        //메인함수로 date_time을 반환하는 get함수
-        return date_time;
+    public String getUserDateTimeInput() {
+        return userDateTimeInput;
     }
 
     public void setMenuNum(int menuNum){
@@ -38,46 +32,48 @@ public class CurrentTime {
         noShowHandling();
     }
 
-    private void enterCurrentTime() {
+    private void getCurrentTimeInput() {
 
         Scanner scanner = new Scanner(System.in);
 
         while(true){
             System.out.println("현재 날짜와 시각을 입력하세요. (입력 예시:2022-9-3/11:01) ");
             System.out.print(">>>");
-            date_time = scanner.next();
-            date_time.trim();
+            userDateTimeInput = scanner.next();
+            userDateTimeInput.trim();
 
-            //구분자 개수 찾기
-            int hyphenNum = date_time.length() - date_time.replace("-","").length();
-            int slashNum = date_time.length() - date_time.replace("/","").length();
-            int twodotNum = date_time.length() - date_time.replace(":","").length();
-            String[] input = date_time.split("-|/|:");
+            String[] userDateTimeInputSplits = userDateTimeInput.split("-|/|:");
 
-            boolean loop=false;
+            boolean getInputAgain = false;
+
             outerLoop:
-            for(int i=0; i<input.length; i++){
-                input[i]=input[i].replaceFirst("^0+(?!$)", "");
-                for(int j=0; j<input[i].length(); j++){
-                    if(input[i].charAt(j) == '.')
+            for(int i=0; i<userDateTimeInputSplits.length; i++){
+                userDateTimeInputSplits[i] = userDateTimeInputSplits[i].replaceFirst("^0+(?!$)", "");
+                for(int j=0; j<userDateTimeInputSplits[i].length(); j++){
+                    if(userDateTimeInputSplits[i].charAt(j) == '.')
                     {
                         System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                        loop=true;
+                        getInputAgain = true;
                         break outerLoop;
                     }
-                    else if((int)input[i].charAt(j) <48 || (int)input[i].charAt(j) >57){
+                    else if((int)userDateTimeInputSplits[i].charAt(j) <48 || (int)userDateTimeInputSplits[i].charAt(j) >57){
                         System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                        loop=true;
+                        getInputAgain = true;
                         break outerLoop;
                     }
                 }
             }
 
-            if(loop){
+            if(getInputAgain){
                 continue;
             }
 
-            if(input.length != 5){
+            //구분자 개수 찾기
+            int hyphenNum = userDateTimeInput.length() - userDateTimeInput.replace("-","").length();
+            int slashNum = userDateTimeInput.length() - userDateTimeInput.replace("/","").length();
+            int twodotNum = userDateTimeInput.length() - userDateTimeInput.replace(":","").length();
+
+            if(userDateTimeInputSplits.length != 5){
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
@@ -95,107 +91,111 @@ public class CurrentTime {
             }
 
             //소수점입력 받았을 때 처리
-            input0 = (int)Double.parseDouble(input[0]);
-            input1 = (int)Double.parseDouble(input[1]);
-            input2 = (int)Double.parseDouble(input[2]);
-            input3 = (int)Double.parseDouble(input[3]);
-            input4 = (int)Double.parseDouble(input[4]);
+            int yearInput, monthInput, dateInput, hourInput, minuteInput;
 
-            if(input0 < 1970){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }else if(input0 > 2037){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }
+            yearInput = (int)Double.parseDouble(userDateTimeInputSplits[0]);
+            monthInput = (int)Double.parseDouble(userDateTimeInputSplits[1]);
+            dateInput = (int)Double.parseDouble(userDateTimeInputSplits[2]);
+            hourInput = (int)Double.parseDouble(userDateTimeInputSplits[3]);
+            minuteInput = (int)Double.parseDouble(userDateTimeInputSplits[4]);
 
-            if(input1 > 12){
+            if(yearInput < 1970){
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
-            }else if(input1 < 1){
+            }else if(yearInput > 2037){
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
 
-
-            if(input1==1 || input1==3 || input1==5 || input1==7 || input1==8 || input1==10 || input1==12){
-                if(input2<1){
-                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                    continue;
-                }else if(input2 > 31){
-                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                    continue;
-                }
-            }else if(input1==2){
+            if(monthInput > 12){
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                if(input2 < 1){
+                continue;
+            }else if(monthInput < 1){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                continue;
+            }
+
+
+            if(monthInput==1 || monthInput==3 || monthInput==5 || monthInput==7 || monthInput==8 || monthInput==10 || monthInput==12){
+                if(dateInput<1){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                     continue;
-                }else if(input2> 28){
+                }else if(dateInput > 31){
                     System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                     continue;
                 }
-            }else if(input1==4 || input1==6 || input1==9 || input1==11) {
-                if(input2 < 1){
+            } else if (monthInput == 2){
+                if(dateInput < 1){
                     System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                     continue;
-                }else if(input2> 30){
+                }else if(dateInput > 28){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                    continue;
+                }
+            } else {
+                if (dateInput < 1) {
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                    continue;
+                } else if (dateInput > 30) {
                     System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                     continue;
                 }
             }
 
-            // input3 = hour
-            if(input3 < 8){
+            if(hourInput < 8){
                 System.out.println("영업시간은 08시부터입니다.");
                 continue;
-            }else if(input3 > 21){
+            }else if(hourInput > 21){
                 System.out.println("영업시간은 22시까지입니다.");
                 continue;
             }
 
-            if(input4 < 0){
+            if (minuteInput < 0) {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
-            }else if(input4 > 59){
+            } else if (minuteInput > 59) {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
                 continue;
             }
 
-            clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
+            userDateTimeInputInFormat = yearInput + "-" + monthInput + "-" + dateInput + "/" + hourInput + ":" + minuteInput;
 
-
-            //--현재 타임 로그 저장---
             File timeLog = new File("timeLog.txt");
             try{
-                if(!timeLog.exists())
+                if(timeLog.exists()) {
+
+                } else {
                     timeLog.createNewFile();
-            }catch (Exception e)
-            {
+                }
+            }catch (Exception e) {
                 e.getStackTrace();
             }
 
             try {
-
-                String log = "\n" +date_time;
+                String log = "\n" +userDateTimeInput;
                 //파일에서 읽은 한라인을 저장하는 임시변수
                 String thisLine = "";
+
                 // 새 로그가 저장될 임시파일 생성
-                File tmpFile = new File("aaaaaaaaaaa.txt");
+                File tmpTimeLogFile = new File("tmpTimelog.txt");
+
                 // 기존 파일
-                FileInputStream currentFile = new FileInputStream("timeLog.txt");
-                BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
+                FileInputStream timeLogInputStream = new FileInputStream("timeLog.txt");
+                BufferedReader in = new BufferedReader(new InputStreamReader(timeLogInputStream));
+
                 // output 파일
-                FileOutputStream fout = new FileOutputStream(tmpFile);
-                PrintWriter out = new PrintWriter(fout);
+                FileOutputStream tmpTimeLogfout = new FileOutputStream(tmpTimeLogFile);
+                PrintWriter tmpTimeLogPrintWriter = new PrintWriter(tmpTimeLogfout);
+
                 //파일 내용을 한라인씩 읽어 삽입될 라인이 오면 문자열을 삽입
-                int k =0;
-                boolean pastFlag = false;
+                int lineCounter =0;
+                boolean isUserInputTimeHasPassed = false;
                 while ((thisLine = in.readLine()) != null) {
                     //"2020-10-03/14:01"
-                    if(k==0)
+                    if(lineCounter == 0)
                     {
                         String[] split1 = thisLine.split("-|/|:");
-                        String[] split2 = clearDateTime.split("-|/|:");
+                        String[] split2 = userDateTimeInputInFormat.split("-|/|:");
                         boolean flag = true;
 
                         if((Integer.parseInt(split2[0]) < Integer.parseInt(split1[0]))) {
@@ -239,30 +239,32 @@ public class CurrentTime {
                         }
 
                         if(flag) {
-                            out.println(clearDateTime);
+                            tmpTimeLogPrintWriter.println(userDateTimeInputInFormat);
                         } else {
                             System.out.println("기록된 현재 시간보다 더 이전 시간을 입력하실 수 없습니다.");
-                            pastFlag = true;
+                            isUserInputTimeHasPassed = true;
                             break;
                         }
                     }
-                    out.println(thisLine);
-                    k++;
+                    tmpTimeLogPrintWriter.println(thisLine);
+                    lineCounter++;
                 } // while 구문 끝
 
 
-                if(pastFlag)
+                if(isUserInputTimeHasPassed) {
                     continue;
+                }
 
-                if(thisLine == null && k ==0)
-                    out.println(clearDateTime);
+                if(thisLine == null && lineCounter == 0) {
+                    tmpTimeLogPrintWriter.println(userDateTimeInputInFormat);
+                }
 
-                out.flush();
-                out.close();
+                tmpTimeLogPrintWriter.flush();
+                tmpTimeLogPrintWriter.close();
                 in.close();
                 timeLog.delete();
                 //임시파일을 원래 파일명으로 변경
-                tmpFile.renameTo(timeLog);
+                tmpTimeLogFile.renameTo(timeLog);
 
             } catch (Exception e) {
                 e.getStackTrace();
@@ -273,7 +275,7 @@ public class CurrentTime {
 
     public void createtxt(){
         //파일 생성
-        split = clearDateTime.split("/");
+        split = userDateTimeInputInFormat.split("/");
         String path = System.getProperty("user.dir"); //현재 파일 경로 가져오기
         //Path directoryPath = Paths.get(path+ "\\" + split[0]); // Main 아래에 현재 날짜로 폴더 생성
 

@@ -7,7 +7,7 @@ public class TestMain {
         System.out.println("주차관리 시스템에 오신 걸 환영합니다.");
         CurrentTime currentTime = new CurrentTime();
         currentTime.setting();
-        String date_time = currentTime.getDateTime();
+        String date_time = currentTime.getUserDateTimeInput();
         MemberManagement memberManagement = new MemberManagement();
         String memberId = memberManagement.registerMember();
 
