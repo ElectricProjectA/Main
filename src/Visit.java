@@ -49,6 +49,7 @@ public class Visit {
                 continue;
             }
 
+            //split[0]: 선택한 메뉴
             if(split[0].equals("1")) {
                 //해당 회원의 차량이 주차 중인지 user.txt파일 확인
                 //주차 중이면 다시 입차 출차 메뉴 선택으로 돌아감
@@ -259,7 +260,6 @@ public class Visit {
         //파일 읽기
         StringBuffer sb = new StringBuffer();
         FileReader readFile;
-        FileReader readFile2;
         String getLine;
 
         String[] memberCarNumList = {};
@@ -276,21 +276,20 @@ public class Visit {
             }
 
             //2. 오늘 날짜에 해당하는 텍스트파일에서 해당 차량이 있는지 확인
-            readFile2 = new FileReader(pathname + "/visited.txt");
-            BufferedReader br2 = new BufferedReader(readFile2);
+            readFile = new FileReader(pathname + "/visited.txt");
+            br.close();
+            br = new BufferedReader(readFile);
 
-            while ((getLine = br2.readLine()) != null) {
+            while ((getLine = br.readLine()) != null) {
                 for (int i = 0; i < memberCarNumList.length; i++) {
                     if (getLine.contains(memberCarNumList[i])) {
                         System.out.println("회원님의 차량이 이미 주차 중입니다.");
                         br.close();
-                        br2.close();
                         return true;
                     }
                 }
             }
             br.close();
-            br2.close();
             System.out.println("주차중인 회원님의 차량이 없습니다. 다음 단계로 이동합니다.");
         } catch (IOException e) {
             e.printStackTrace();
