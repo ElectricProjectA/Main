@@ -41,7 +41,6 @@ public class TestMain {
                 System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
             }
 
-            currentTime.setMenuNum(menu);
             currentTime.noShowHandling();
             switch (menu) {
                 case 1:
