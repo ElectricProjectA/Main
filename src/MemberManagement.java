@@ -56,8 +56,7 @@ public class MemberManagement {
             int k = 0;
             boolean isRegisteredMember = false;
             while ((thisLine = in.readLine()) != null) {
-                //"2020-10-03/14:01"
-                if(thisLine.equals(memberId))
+                if(thisLine.contains(memberId))
                     isRegisteredMember = true;
                 out.println(thisLine);
                 k++;

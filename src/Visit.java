@@ -265,7 +265,6 @@ public class Visit {
 
     private boolean isAlreadyParked() {
         //파일 읽기
-        StringBuffer sb = new StringBuffer();
         FileReader readFile;
         String getLine;
 
