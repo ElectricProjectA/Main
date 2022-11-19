@@ -14,55 +14,58 @@ public class MemberManagement {
             memberIdInput.trim();
 
             if (isCorrectMemberIdType(memberIdInput)) continue;
-
-            File userTxt = new File("User.txt");
-            try {
-                if (!userTxt.exists())
-                    userTxt.createNewFile();
-            } catch (Exception e) {
-                e.getStackTrace();
-            }
-
-            try
-            {
-                //파일에서 읽은 한라인을 저장하는 임시변수
-                String thisLine = "";
-                // 새 로그가 저장될 임시파일 생성
-                File tmpFile = new File("aaaaaaaaaaa.txt");
-                // 기존 파일
-                FileInputStream currentFile = new FileInputStream("User.txt");
-                BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
-                // output 파일
-                FileOutputStream fout = new FileOutputStream(tmpFile);
-                PrintWriter out = new PrintWriter(fout);
-                //파일 내용을 한라인씩 읽어 삽입될 라인이 오면 문자열을 삽입
-                int k = 0;
-                boolean isRegisteredMember = false;
-                while ((thisLine = in.readLine()) != null) {
-                    //"2020-10-03/14:01"
-                    if(thisLine.equals(memberId))
-                        isRegisteredMember = true;
-                    out.println(thisLine);
-                    k++;
-                }
-                if (thisLine == null && k == 0)
-                    out.print(memberId);
-                else if(!isRegisteredMember)
-                    out.println(memberId);
-                out.flush();
-                out.close();
-                in.close();
-                userTxt.delete();
-                //임시파일을 원래 파일명으로 변경
-                tmpFile.renameTo(userTxt);
-
-            } catch (Exception e) {
-                e.getStackTrace();
-            }
+            createUserTxt();
 
             break;
         }
         return memberId; //memberId return
+    }
+
+    private void createUserTxt() {
+        File userTxt = new File("User.txt");
+        try {
+            if (!userTxt.exists())
+                userTxt.createNewFile();
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+
+        try
+        {
+            //파일에서 읽은 한라인을 저장하는 임시변수
+            String thisLine = "";
+            // 새 로그가 저장될 임시파일 생성
+            File tmpFile = new File("aaaaaaaaaaa.txt");
+            // 기존 파일
+            FileInputStream currentFile = new FileInputStream("User.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
+            // output 파일
+            FileOutputStream fout = new FileOutputStream(tmpFile);
+            PrintWriter out = new PrintWriter(fout);
+            //파일 내용을 한라인씩 읽어 삽입될 라인이 오면 문자열을 삽입
+            int k = 0;
+            boolean isRegisteredMember = false;
+            while ((thisLine = in.readLine()) != null) {
+                //"2020-10-03/14:01"
+                if(thisLine.equals(memberId))
+                    isRegisteredMember = true;
+                out.println(thisLine);
+                k++;
+            }
+            if (thisLine == null && k == 0)
+                out.print(memberId);
+            else if(!isRegisteredMember)
+                out.println(memberId);
+            out.flush();
+            out.close();
+            in.close();
+            userTxt.delete();
+            //임시파일을 원래 파일명으로 변경
+            tmpFile.renameTo(userTxt);
+
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
     }
 
     private boolean isCorrectMemberIdType(String memberIdInput) {
