@@ -14,9 +14,9 @@ public class CurrentTime {
 
     }
 
-    public void setting() {
-        getCurrentTimeInput();
-        createtxt();
+    public void setCurrentTime() {
+        getCurrentTimeInputAndSaveToTimeLog();
+        createVisitedAndBookedTxt();
     }
 
     public String getUserDateTimeInput() {
@@ -32,7 +32,7 @@ public class CurrentTime {
         noShowHandling();
     }
 
-    private void getCurrentTimeInput() {
+    private void getCurrentTimeInputAndSaveToTimeLog() {
 
         Scanner scanner = new Scanner(System.in);
 
@@ -44,7 +44,7 @@ public class CurrentTime {
 
             String[] userDateTimeInputSplits = userDateTimeInput.split("-|/|:");
 
-            boolean getInputAgain = false;
+            boolean shouldGetInputAgain = false;
 
             outerLoop:
             for(int i=0; i<userDateTimeInputSplits.length; i++){
@@ -53,18 +53,18 @@ public class CurrentTime {
                     if(userDateTimeInputSplits[i].charAt(j) == '.')
                     {
                         System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                        getInputAgain = true;
+                        shouldGetInputAgain = true;
                         break outerLoop;
                     }
                     else if((int)userDateTimeInputSplits[i].charAt(j) <48 || (int)userDateTimeInputSplits[i].charAt(j) >57){
                         System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                        getInputAgain = true;
+                        shouldGetInputAgain = true;
                         break outerLoop;
                     }
                 }
             }
 
-            if(getInputAgain){
+            if(shouldGetInputAgain){
                 continue;
             }
 
@@ -273,7 +273,7 @@ public class CurrentTime {
         }
     }
 
-    public void createtxt(){
+    public void createVisitedAndBookedTxt(){
         //파일 생성
         split = userDateTimeInputInFormat.split("/");
         String path = System.getProperty("user.dir"); //현재 파일 경로 가져오기
