@@ -92,6 +92,7 @@ public class CurrentTime {
                     }
                 }
             }
+
             if(loop){
                 continue;
             }

@@ -1,6 +1,4 @@
 import java.io.*;
-import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -11,29 +9,29 @@ import java.lang.Integer;
 public class Reservation {
 
     private String currentTime;
-    private String clearCurrentTime;
+    private String currentTimeWithoutZero;
     private String carNum;
     private boolean[][] parkA = new boolean[4][4];
     private boolean[][] parkB = new boolean[4][4];
     //printParkingStatus()에서, parkA와 parkB에 txt파일로부터 주차 정보를 가져와 저장함
     //parkA[i][j] = true면 주차된 자리, false이면 주차 가능한 자리
     private String reservationArea = ""; //주차한 위치
-    private String pathname;
+    private String pathName;
     private String clearReservationTime;
     private String resTime;
 
 
-    int input0;
-    int input1;
-    int input2;
-    int input3;
-    int input4;
-    int rinput0;
-    int rinput1;
-    int rinput2;
-    int rinput3;
-    int rinput4;
-    String t;
+    int currentYear;
+    int currentMonth;
+    int currentDate;
+    int currentHour;
+    int currentMinute;
+    int reservationYear;
+    int reservationMonth;
+    int reservationDate;
+    int reservationHour;
+    int reservationMinute;
+    String reservationTime;
     public Reservation(String currentTime) {
         this.currentTime = currentTime;
     }
@@ -47,8 +45,6 @@ public class Reservation {
             if(!flag)
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요");
         }
-
-
 
         boolean isNotOk = true;
         while(isNotOk)
@@ -244,20 +240,20 @@ public class Reservation {
         }
         int countA =0;
         int countB =0;
-        input0 = (int)Double.parseDouble(input[0]);
-        input1 = (int)Double.parseDouble(input[1]);
-        input2 = (int)Double.parseDouble(input[2]);
-        input3 = (int)Double.parseDouble(input[3]);
-        input4 = (int)Double.parseDouble(input[4]);
+        currentYear = (int)Double.parseDouble(input[0]);
+        currentMonth = (int)Double.parseDouble(input[1]);
+        currentDate = (int)Double.parseDouble(input[2]);
+        currentHour = (int)Double.parseDouble(input[3]);
+        currentMinute = (int)Double.parseDouble(input[4]);
 
-        clearCurrentTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
-        pathname = input0+"-"+input1+"-"+input2;
+        currentTimeWithoutZero = currentYear +"-"+ currentMonth +"-"+ currentDate +"/"+ currentHour +":"+ currentMinute;
+        pathName = currentYear +"-"+ currentMonth +"-"+ currentDate;
 
-        String[] sp = clearCurrentTime.split("/");
+        String[] sp = currentTimeWithoutZero.split("/");
         //(입력 예시: 2022-9-28/14:00)
 
         SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-mm-dd/HH:mm");
-        Date resDate = timeFormat.parse(clearCurrentTime);
+        Date resDate = timeFormat.parse(currentTimeWithoutZero);
         Calendar resCal = Calendar.getInstance();
         resCal.setTime(resDate);
         int resHour = resCal.get(Calendar.HOUR_OF_DAY);
@@ -269,13 +265,13 @@ public class Reservation {
         String getLine;
 
         try {
-            readBookedFile = new FileReader(pathname + "/booked.txt");
-            readVisitedFile = new FileReader(pathname + "/visited.txt");
+            readBookedFile = new FileReader(pathName + "/booked.txt");
+            readVisitedFile = new FileReader(pathName + "/visited.txt");
 
             // 방문자 처리
             // 현재 날짜와 예약 날짜가 다르면 처리 안 해줘도 되고, 같으면 처리(Visit.java에서 활용 가능)
             // inputReservationTime에서 이미 3일 이후나 이전 날짜 처리 했으니 연도는 체크 안 해도 됨. 월일이 같은데 연도가 다를 수가 없음
-            String[] currentDate = clearCurrentTime.split("/")[0].split("-"); // 2022 09 22
+            String[] currentDate = currentTimeWithoutZero.split("/")[0].split("-"); // 2022 09 22
             String[] rsvDate = clearReservationTime.split("/")[0].split("-"); // 2022 09 22
             if(rsvDate[1].equals(currentDate[1]) && rsvDate[2].equals(currentDate[2])){
                 BufferedReader brr = new BufferedReader(readVisitedFile);
@@ -296,7 +292,7 @@ public class Reservation {
             // 예약자 처리
             BufferedReader br = new BufferedReader(readBookedFile);
             while((getLine = br.readLine()) != null) {
-                Date bookedDate = timeFormat.parse(clearCurrentTime);
+                Date bookedDate = timeFormat.parse(currentTimeWithoutZero);
                 Calendar bookedCal = Calendar.getInstance();
                 bookedCal.setTime(bookedDate);
                 int bookedHour = bookedCal.get(Calendar.HOUR_OF_DAY);
@@ -354,227 +350,280 @@ public class Reservation {
     }
 
     private boolean inputReservationTime() throws ParseException {
-//        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-mm-dd/HH:mm");
-//        Date currentDate = timeFormat.parse(clearcurrentTime);
-//        Calendar curCal = Calendar.getInstance();
-//        curCal.setTime(currentDate);
 
         Scanner sc = new Scanner(System.in);
         while(true){
             System.out.println("예약 날짜 및 시간을 입력하세요. 시간은 30분 단위입니다. (입력 예시: 2022-09-29/12:00)");
             System.out.print("(종료하려면 q를 입력하세요) => ");
-            t = sc.next();
-            t.trim();
-            if(t.equals("q")) System.exit(0);
-
-
-            String[] input = currentTime.split("-|/|:");
-            for(int i=0; i<input.length; i++) {
-                input[i] = input[i].replaceFirst("^0+(?!$)", "");
+            reservationTime = sc.next();
+            reservationTime.trim();
+            if(reservationTime.equals("q"))
+            {
+                System.out.println("종료합니다.");
+                System.exit(0);
             }
 
-            input0 = (int)Double.parseDouble(input[0]);
-            input1 = (int)Double.parseDouble(input[1]);
-            input2 = (int)Double.parseDouble(input[2]);
-            input3 = (int)Double.parseDouble(input[3]);
-            input4 = (int)Double.parseDouble(input[4]);
+            currentTimeWithoutZero = getClearCurrentTime();  //현재 시간 입력에 쓸데없는 0을 많이 넣어도 모두 없애는 메서드 ex) 2022/00002/3 ->2022/2/3
+            pathName = currentYear +"-"+ currentMonth +"-"+ currentDate;
 
-            clearCurrentTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
-            pathname = input0+"-"+input1+"-"+input2;
-
-            int hyphenNum = t.length() - t.replace("-","").length();
-            int slashNum = t.length() - t.replace("/","").length();
-            int twodotNum = t.length() - t.replace(":","").length();
-            String[] rinput = t.split("-|/|:");
-
-            boolean loop=false;
-            outerloop:
-            for(int i=0; i<rinput.length; i++){
-                rinput[i]=rinput[i].replaceFirst("^0+(?!$)", "");
-                for(int j=0; j<rinput[i].length(); j++){
-                    if((int)rinput[i].charAt(j) == 46)
-                        continue;
-                    else if((int)rinput[i].charAt(j) <48 || (int)rinput[i].charAt(j) >57){
-                        System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                        loop=true;
-                        break outerloop;
-                    }
-                }
-            }
-            if(loop){
-                continue;
-            }
-
-            if(rinput.length != 5){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }
-            if(hyphenNum != 2){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }
-            if(slashNum != 1){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }
-            if(twodotNum != 1){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }
-
-            //ReservationTime
-            //소수점입력 받았을 때 처리
-            rinput0 = (int)Double.parseDouble(rinput[0]);//년도
-            rinput1 = (int)Double.parseDouble(rinput[1]);//달
-            rinput2 = (int)Double.parseDouble(rinput[2]);//일
-            rinput3 = (int)Double.parseDouble(rinput[3]);//시간
-            rinput4 = (int)Double.parseDouble(rinput[4]);//분
-
-            String[] currentTime = clearCurrentTime.split("-|/|:");
-
-            int date = 0;
-            if(rinput0 < 1970){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }else if(rinput0 > 2037){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }
-            if((Integer.parseInt(currentTime[0]) > rinput0)) {
-                System.out.println("기록된 year 보다 과거입니다");
-                continue;
-            }else if((Integer.parseInt(currentTime[0]) < rinput0)){
-                if(rinput0-(Integer.parseInt(currentTime[0])) > 1){
-                    System.out.println("3일 이후는 예약할 수 없습니다.");
-                    continue;
-                }else if(rinput0-(Integer.parseInt(currentTime[0])) == 1){
-                    if(rinput1 == 1 && (Integer.parseInt(currentTime[1]) == 12)){
-                        if(31-(Integer.parseInt(currentTime[2]))+rinput2 > 3){
-                            System.out.println("3일 이후는 예약할 수 없습니다.");
-                            continue;
-                        }
-                    }else{
-                        System.out.println("3일 이후는 예약할 수 없습니다.");
-                        continue;
-                    }
-                }
-            }else {
-                // when years are the same
-                if((Integer.parseInt(currentTime[1]) > rinput1)) {
-                    System.out.println("기록된 month 보다 과거입니다");
-                    continue;
-                }else {
-                    int currmonth=Integer.parseInt(currentTime[1]);
-                    int currday=Integer.parseInt(currentTime[2]);
-                    if(currmonth==1 ||currmonth==3 ||currmonth==5 ||currmonth==7 ||currmonth==8||currmonth==10 ||currmonth==12){
-                        date=31;
-                    }else if(currmonth==4 ||currmonth==6 ||currmonth==9 ||currmonth==11){
-                        date=30;
-                    }else if(currmonth==2){
-                        date=28;
-                    }
-                    // when years and months are the same
-                    if(currmonth==rinput1&& (currday > rinput2)) {
-                        System.out.println("기록된 date 보다 과거입니다");
-                        continue;
-                    }else if(currmonth<rinput1&& (date-currday+rinput2) > 3){
-                        System.out.println("3일 이후는 예약할 수 없습니다.");
-                        continue;
-                    }else if(currmonth==rinput1&& rinput2 - currday > 3)
-                    {
-                        System.out.println("3일 이후는 예약할 수 없습니다.");
-                        continue;
-                    } else {
-                        // when years, months and dates are the same
-                        if((Integer.parseInt(currentTime[3]) > rinput3)) {
-                            System.out.println("기록된 time 보다 과거입니다");
-                            continue;
-                        }else {
-                            // when years, months, dates and times are the same
-                            if((Integer.parseInt(currentTime[4]) > rinput4)) {
-                                System.out.println("기록된 time 보다 과거입니다");
-                                continue;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(rinput1 > 12){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }else if(rinput1 < 1){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }
-
-            if(rinput1==1 || rinput1==3 || rinput1==5 || rinput1==7 || rinput1==8 || rinput1==10 || rinput1==12){
-                if(rinput2<1){
-                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                    continue;
-                }else if(rinput2 > 31){
-                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                    continue;
-                }
-            }else if(rinput1==2){
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                if(rinput2 < 1){
-                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                    continue;
-                }else if(rinput2> 28){
-                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                    continue;
-                }
-            }else if(rinput1==4 || rinput1==6 || rinput1==9 || rinput1==11) {
-                if(rinput2 < 1){
-                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                    continue;
-                }else if(rinput2> 30){
-                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                    continue;
-                }
-            }
-
-            // input3 = hour
-            if(rinput3 < 8){
-                System.out.println("영업시간은 08시부터입니다.");
-                continue;
-            }else if(rinput3 > 21){
-                System.out.println("영업시간은 22시까지입니다.");
-                continue;
-            }
-
-            if(rinput4 == 0 || rinput4 == 30){
-
-            }else{
-                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                continue;
-            }
-
-
-            clearReservationTime = rinput0+"-"+rinput1+"-"+rinput2+"/"+rinput3+":"+rinput4;
-
-
-            String[] split = clearReservationTime.split("/");
-            File reserveFile = new File(split[0]);
-            try {
-                if(!reserveFile.exists())
-                {
-                    reserveFile.mkdir();
-                    File visit = new File(split[0] + "/visited.txt");
-                    File booked = new File(split[0] + "/booked.txt");
-
-                    visit.createNewFile();
-                    booked.createNewFile();
-
-                }
-            }catch(IOException e){
-                e.printStackTrace();
-            }
-
+            if (isReservationTimeNotIncludedScope()) continue;
+            createReservationTxt();
             break;
         }
-
         return true;
+    }
+
+    private boolean isReservationTimeNotIncludedScope() {
+        String[] splitReservationTime = getSplitReservationTime();
+        if (splitReservationTime == null) return true;
+
+        //ReservationTime
+        //소수점입력 받았을 때 처리
+        reservationYear = (int)Double.parseDouble(splitReservationTime[0]);//년도
+        reservationMonth = (int)Double.parseDouble(splitReservationTime[1]);//달
+        reservationDate = (int)Double.parseDouble(splitReservationTime[2]);//일
+        reservationHour = (int)Double.parseDouble(splitReservationTime[3]);//시간
+        reservationMinute = (int)Double.parseDouble(splitReservationTime[4]);//분
+
+        //1월에서 12사이 인지/ 1970과 2037년 사이인지
+        if (isYearAndMonthIncludedInScope()) return true;
+        if (isDateIncludedInScope()) return true;
+        if (isHourAndMinuteIncludedInScope()) return true;
+
+        //현재보다 과거인지 / 현재 년도와 예약 년도가 3일 이상 차이나는지 계산합니다.
+        if (isYearGapNotOk()) return true;
+        if(currentYear == reservationYear)
+        {
+            if(currentMonth > reservationMonth) {
+                System.out.println("기록된 month 보다 과거입니다");
+                return true;
+            }
+            else
+            {
+                //현재 date 와 예약 date 가 3일 이상 차이나는지 계산합니다.
+                if (isDateGapNotOk()) return true;
+                //예약 시간의 시간과 분이 현재보다 과거인지 판별합니다.
+                if(currentMonth == reservationMonth && reservationDate == currentDate )
+                    if (isHourAndMinuteGapNotOk()) return true;
+            }
+        }
+        return false;
+    }
+
+    private void createReservationTxt() {
+        clearReservationTime = reservationYear +"-"+ reservationMonth +"-"+ reservationDate + "/" + reservationHour+":"+reservationMinute;
+        File reserveFile = new File(reservationYear +"-"+ reservationMonth +"-"+ reservationDate);
+        try {
+            if(!reserveFile.exists())
+            {
+                reserveFile.mkdir();
+                File visit = new File(reservationYear +"-"+ reservationMonth +"-"+ reservationDate+ "/visited.txt");
+                File booked = new File(reservationYear +"-"+ reservationMonth +"-"+ reservationDate + "/booked.txt");
+
+                visit.createNewFile();
+                booked.createNewFile();
+
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+            System.out.println("예약 파일이 없습니다.");
+        }
+    }
+
+    private boolean isYearAndMonthIncludedInScope() {
+        if(reservationYear < 1970){
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+            return true;
+        }else if(reservationYear > 2037){
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+            return true;
+        }
+        if(reservationMonth > 12){
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+            return true;
+        }else if(reservationMonth < 1){
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isHourAndMinuteIncludedInScope() {
+        if(reservationHour < 8){
+            System.out.println("영업시간은 08시부터입니다.");
+            return true;
+        }else if(reservationHour > 21){
+            System.out.println("영업시간은 22시까지입니다.");
+            return true;
+        }
+        if(reservationMinute != 0 && reservationMinute != 30)
+        {
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isDateIncludedInScope() {
+        if(reservationMonth ==1 || reservationMonth ==3 || reservationMonth ==5 || reservationMonth ==7 || reservationMonth ==8 || reservationMonth ==10 || reservationMonth ==12){
+            if(reservationDate <1){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                return true;
+            }else if(reservationDate > 31){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                return true;
+            }
+        }else if(reservationMonth ==2){
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+            if(reservationDate < 1){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                return true;
+            }else if(reservationDate > 28){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                return true;
+            }
+        }else if(reservationMonth ==4 || reservationMonth ==6 || reservationMonth ==9 || reservationMonth ==11) {
+            if(reservationDate < 1){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                return true;
+            }else if(reservationDate > 30){
+                System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isDateGapNotOk() {
+        int maxDateInCurrentMonth = 0;
+        if(currentMonth==1 ||currentMonth==3 ||currentMonth==5 ||currentMonth==7 ||currentMonth==8||currentMonth==10 ||currentMonth==12){
+            maxDateInCurrentMonth=31;
+        }else if(currentMonth==4 ||currentMonth==6 ||currentMonth==9 ||currentMonth==11){
+            maxDateInCurrentMonth=30;
+        }else if(currentMonth==2){
+            maxDateInCurrentMonth=28;
+        }
+        if(currentMonth== reservationMonth && (currentDate > reservationDate)) {
+            System.out.println("기록된 date 보다 과거입니다");
+            return true;
+        }else if(currentMonth< reservationMonth && (maxDateInCurrentMonth-currentDate+ reservationDate) > 3){
+            System.out.println("3일 이후는 예약할 수 없습니다.");
+            return true;
+        }
+        else if(currentMonth== reservationMonth && reservationDate - currentDate > 3)
+        {
+            System.out.println("3일 이후는 예약할 수 없습니다.");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isHourAndMinuteGapNotOk() {
+        if(currentHour > reservationHour) {
+            System.out.println("기록된 time 보다 과거입니다");
+            return true;
+        }
+        else
+        {
+            // when years, months, dates and times are the same
+            if(currentHour == reservationHour && currentMinute > reservationMinute) {
+                System.out.println("기록된 time 보다 과거입니다");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isYearGapNotOk() {
+        if(currentYear > reservationYear) {
+            System.out.println("기록된 year 보다 과거입니다");
+            return true;
+        }
+        else
+        {
+            if(reservationYear -currentYear > 1){
+                System.out.println("3일 이후는 예약할 수 없습니다.");
+                return true;
+            }
+            else if(reservationYear -currentYear == 1)
+            {
+                //2022/12/31 과 2023/1/1의 경우를 계산함 
+                if(reservationMonth == 1 && currentMonth == 12)
+                {
+                    if(31-currentDate+ reservationDate > 3)
+                    {
+                        System.out.println("3일 이후는 예약할 수 없습니다.");
+                        return true;
+                    }
+                }
+                else
+                {
+                    System.out.println("3일 이후는 예약할 수 없습니다.");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private String[] getSplitReservationTime() {
+        int hyphenNum = reservationTime.length() - reservationTime.replace("-","").length();
+        int slashNum = reservationTime.length() - reservationTime.replace("/","").length();
+        int twoDotNum = reservationTime.length() - reservationTime.replace(":","").length();
+        String[] splitReservationTime = reservationTime.split("-|/|:");
+
+        boolean loopFlag = false;
+        outerLoop:
+        for(int i=0; i<splitReservationTime.length; i++){
+            splitReservationTime[i]=splitReservationTime[i].replaceFirst("^0+(?!$)", "");
+            for(int j=0; j<splitReservationTime[i].length(); j++){
+                if(splitReservationTime[i].charAt(j) == '.')
+                {
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                    loopFlag=true;
+                    break outerLoop;
+                }
+                else if((int)splitReservationTime[i].charAt(j) <'0' || (int)splitReservationTime[i].charAt(j) >'9'){
+                    System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+                    loopFlag=true;
+                    break outerLoop;
+                }
+            }
+        }
+
+        if(loopFlag){
+            return null;
+        }
+        if(splitReservationTime.length != 5){
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+            return null;
+        }
+        if(hyphenNum != 2){
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+            return null;
+        }
+        if(slashNum != 1){
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+            return null;
+        }
+        if(twoDotNum != 1){
+            System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
+            return null;
+        }
+        return splitReservationTime;
+    }
+
+    private String getClearCurrentTime() {
+        String[] splitCurrentTime = currentTime.split("[-/:]");
+        for(int i=0; i<splitCurrentTime.length; i++) {
+            splitCurrentTime[i] = splitCurrentTime[i].replaceFirst("^0+(?!$)", "");
+        }
+        currentYear = (int)Double.parseDouble(splitCurrentTime[0]);
+        currentMonth = (int)Double.parseDouble(splitCurrentTime[1]);
+        currentDate = (int)Double.parseDouble(splitCurrentTime[2]);
+        currentHour = (int)Double.parseDouble(splitCurrentTime[3]);
+        currentMinute = (int)Double.parseDouble(splitCurrentTime[4]);
+
+        return currentYear +"-"+ currentMonth +"-"+ currentDate +"/"+ currentHour +":"+ currentMinute;
     }
 }
