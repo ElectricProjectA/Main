@@ -4,7 +4,6 @@ import java.io.*;
 
 public class Visit {
 
-    MemberManagement memberManagement = new MemberManagement();
     private String parkingArea = "";
     Scanner scan = new Scanner(System.in);
     String memberId;
@@ -15,6 +14,7 @@ public class Visit {
     private boolean[][] parkA = new boolean[4][4];
     private boolean[][] parkB = new boolean[4][4];
 
+    String pathname;
     int input0;
     int input1;
     int input2;
@@ -25,6 +25,7 @@ public class Visit {
         this.currentTime = currentTime;
         this.memberId = memberId;
     }
+    MemberManagement memberManagement ;
 
     public void menu()
     {
@@ -36,6 +37,9 @@ public class Visit {
 
         int menu =0;
         boolean flag = true;
+
+        makePathname();
+
         while(flag)
         {
             System.out.println("1)입차 2)출차");
@@ -119,17 +123,8 @@ public class Visit {
         return true;
     }
 
-    String pathname;
-
-    private boolean isCarExist() {
-        String[] split = currentTime.split("/");
-        //currentTime: 생상자로 받아온 현재 날짜와 시각
-        // 입력 예시: 2022-9-28/14:00
-
-        StringBuffer sb = new StringBuffer();
-        FileReader readFile;
-        String getLine;
-
+    private void makePathname() {
+        //전역변수로 선언된 pathname 생성. pathname은 현재 날짜와 시간 정보를 저장
         String[] input = currentTime.split("-|/|:");
         for(int i=0; i<input.length; i++) {
             input[i] = input[i].replaceFirst("^0+(?!$)", "");
@@ -143,6 +138,17 @@ public class Visit {
 
         clearDateTime = input0+"-"+input1+"-"+input2+"/"+input3+":"+input4;
         pathname = input0+"-"+input1+"-"+input2;
+    }
+
+    private boolean isCarExist() {
+        //String[] split = currentTime.split("/");
+        //currentTime: 생상자로 받아온 현재 날짜와 시각
+        // 입력 예시: 2022-9-28/14:00
+
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+
         try {
             readFile = new FileReader(pathname + "/visited.txt");
             BufferedReader br = new BufferedReader(readFile);
@@ -189,6 +195,7 @@ public class Visit {
         System.out.println("차량 번호 확인이 완료되었습니다.");
 
         //2. 해당 회원 정보에 등록된 차량인지 확인
+        memberManagement = new MemberManagement(memberId);
         if(!memberManagement.addNewCarToMember(carNum)) {
             //신규 차량 등록
             System.out.println("신규 차량을 등록합니다.");
@@ -265,7 +272,7 @@ public class Visit {
         String[] memberCarNumList = {};
         try {
             //1. user.txt에서 사용자의 차량 저장
-            readFile = new FileReader("user.txt");
+            readFile = new FileReader("User.txt");
             BufferedReader br = new BufferedReader(readFile);
 
             while ((getLine = br.readLine()) != null) {
@@ -281,7 +288,7 @@ public class Visit {
             br = new BufferedReader(readFile);
 
             while ((getLine = br.readLine()) != null) {
-                for (int i = 0; i < memberCarNumList.length; i++) {
+                for (int i = 1; i < memberCarNumList.length; i++) {
                     if (getLine.contains(memberCarNumList[i])) {
                         System.out.println("회원님의 차량이 이미 주차 중입니다.");
                         br.close();

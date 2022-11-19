@@ -6,6 +6,14 @@ import java.util.Scanner;
 public class MemberManagement {
 
     private String memberId;
+
+    public MemberManagement() {
+    }
+
+    public MemberManagement(String memberId) {
+        this.memberId = memberId;
+    }
+
     public String registerMember() {
 
         Scanner scan = new Scanner(System.in);
@@ -119,10 +127,10 @@ public class MemberManagement {
         StringBuffer sb = new StringBuffer();
         FileReader readFile;
         String getLine;
-
+        File userTxt = new File("User.txt");
         try {
             // 기존 파일
-            FileInputStream currentFile = new FileInputStream("User.txt");
+            FileInputStream currentFile = new FileInputStream(userTxt);
             BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
             //파일에서 읽은 한라인을 저장하는 임시변수
             // 새 로그가 저장될 임시파일 생성
@@ -132,25 +140,30 @@ public class MemberManagement {
             PrintWriter out = new PrintWriter(fout);
 
             while ((getLine = in.readLine()) != null) {
-
                 if (getLine.contains(memberId)) {
                     String[] infoSplit = getLine.split(" ");
                     if(getLine.contains(carNum))
                     {
-                        System.out.println("회원에 등록된 차량입니다. 환영합니다.");
+                        System.out.println("이미 회원에 등록된 차량입니다. 환영합니다.");
                         out.println(getLine);
                     }
                     else
                     {
                         String newCarListForMember = getLine +" "+ carNum;
                         out.println(newCarListForMember);
+
                     }
 
                 }
                 else
                     out.println(getLine);
             }
+            out.flush();
+            out.close();
             in.close();
+            userTxt.delete();
+            //임시파일을 원래 파일명으로 변경
+            tmpFile.renameTo(userTxt);
         } catch (IOException e) {
             e.printStackTrace();
         }
