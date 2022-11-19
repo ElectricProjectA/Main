@@ -44,7 +44,7 @@ public class CurrentTime {
 
             String[] userDateTimeInputSplits = userDateTimeInput.split("-|/|:");
 
-            boolean shouldGetInputAgain = false;
+            boolean isGettingInputAgainNeccesary = false;
 
             outerLoop:
             for(int i=0; i<userDateTimeInputSplits.length; i++){
@@ -53,18 +53,18 @@ public class CurrentTime {
                     if(userDateTimeInputSplits[i].charAt(j) == '.')
                     {
                         System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                        shouldGetInputAgain = true;
+                        isGettingInputAgainNeccesary = true;
                         break outerLoop;
                     }
                     else if((int)userDateTimeInputSplits[i].charAt(j) <48 || (int)userDateTimeInputSplits[i].charAt(j) >57){
                         System.out.println("잘못된 입력입니다. 다시 입력해주세요.");
-                        shouldGetInputAgain = true;
+                        isGettingInputAgainNeccesary = true;
                         break outerLoop;
                     }
                 }
             }
 
-            if(shouldGetInputAgain){
+            if(isGettingInputAgainNeccesary){
                 continue;
             }
 
