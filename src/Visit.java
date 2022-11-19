@@ -50,11 +50,19 @@ public class Visit {
                 continue;
             }
 
-            if(split[0].equals("1") || split[0].equals("2"))
-            {
+            if(split[0].equals("1")) {
+                //해당 회원의 차량이 주차 중인지 user.txt파일 확인
+                //주차 중이면 다시 입차 출차 메뉴 선택으로 돌아감
+                if(isAlreadyParked())
+                    continue;
                 menu = Integer.parseInt(split[0]);
                 break;
             }
+            else if (split[0].equals("2")) {
+                menu = Integer.parseInt(split[0]);
+                break;
+            }
+
             System.out.println("잘못된 형식입니다. 다시 입력해주세요.");
         }
 
@@ -69,6 +77,7 @@ public class Visit {
                 break;
         }
     }
+
 
     private boolean isOpen() {
         System.out.println();
@@ -136,7 +145,6 @@ public class Visit {
         pathname = input0+"-"+input1+"-"+input2;
         try {
             readFile = new FileReader(pathname + "/visited.txt");
-
             BufferedReader br = new BufferedReader(readFile);
 
             while((getLine = br.readLine()) != null) {
@@ -178,9 +186,17 @@ public class Visit {
                 System.out.println("잘못된 입력입니다. 다시 입력해주세요");
             }
         }
-        System.out.println("차량 번호 확인이 완료되었습니다. 예약 여부 확인 단계로 넘어갑니다.");
+        System.out.println("차량 번호 확인이 완료되었습니다.");
 
-        //2. 예약 고객인지 확인
+        //2. 해당 회원 정보에 등록된 차량인지 확인
+        if(!isAlreadyRegisteredCar()) {
+            //신규 차량 등록
+            System.out.println("신규 차량을 등록합니다.");
+            //user.txt에서 memberId를 찾아서 그 줄의 마지막에 차량 신규 등록
+
+        }
+
+        //3. 예약 고객인지 확인
         if(isReservedUser()) {
             // when user have reserved
             if(isReservedSeatOccupied()) {
@@ -239,6 +255,75 @@ public class Visit {
             enterParkingSeat();
             entryCompleted();//이게 txt 넣는 곳
         }
+    }
+
+    private boolean isAlreadyRegisteredCar() {
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+
+        try {
+            readFile = new FileReader("user.txt");
+            BufferedReader br = new BufferedReader(readFile);
+
+            while ((getLine = br.readLine()) != null) {
+                if (getLine.contains(memberId)) {
+                    String[] infoSplit = getLine.split(" ");
+                    for(int i = 1; i < infoSplit.length; i++) {
+                        if (infoSplit[i].equals(carNum)) {
+                            System.out.println("이미 회원 차량으로 등록된 차량입니다. 예약 여부 확인 단계로 넘어갑니다.");
+                            return true;
+                        }
+                    }
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    private boolean isAlreadyParked() {
+        //파일 읽기
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        FileReader readFile2;
+        String getLine;
+
+        String[] memberCarNumList = {};
+        try {
+            //1. user.txt에서 사용자의 차량 저장
+            readFile = new FileReader("user.txt");
+            BufferedReader br = new BufferedReader(readFile);
+
+            while ((getLine = br.readLine()) != null) {
+                if (getLine.contains(memberId)) {
+                    memberCarNumList = getLine.split(" ");
+                    break;
+                }
+            }
+
+            //2. 오늘 날짜에 해당하는 텍스트파일에서 해당 차량이 있는지 확인
+            readFile2 = new FileReader(pathname + "/visited.txt");
+            BufferedReader br2 = new BufferedReader(readFile2);
+
+            while ((getLine = br2.readLine()) != null) {
+                for (int i = 0; i < memberCarNumList.length; i++) {
+                    if (getLine.contains(memberCarNumList[i])) {
+                        System.out.println("회원님의 차량이 이미 주차 중입니다.");
+                        br.close();
+                        br2.close();
+                        return true;
+                    }
+                }
+            }
+            br.close();
+            br2.close();
+            System.out.println("주차중인 회원님의 차량이 없습니다. 다음 단계로 이동합니다.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private String occupyingVisiter() {

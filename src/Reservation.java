@@ -38,6 +38,12 @@ public class Reservation {
 
     public void reservation() throws ParseException
     {
+        //blacklist에 있는 회원인지 확인
+        if(isOnBlacklist()) {
+            System.out.println("예약 서비스가 제한된 회원입니다.");
+            System.exit(0);
+        }
+
         boolean flag = false;
         while(!flag)
         {
@@ -69,6 +75,28 @@ public class Reservation {
 
 
     }
+
+    private boolean isOnBlacklist() {
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+
+        try {
+            readFile = new FileReader("blacklist.txt");
+            BufferedReader br = new BufferedReader(readFile);
+
+            while ((getLine = br.readLine()) != null) {
+                if (getLine.contains(memberId)) {
+                    return true;
+                }
+            }
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private void enterParkingSeat() { //올바르게 입력 할때까지 무한루프
         boolean A = true;
         for (int i = 0; i < 4; i++) {
