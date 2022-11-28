@@ -9,6 +9,8 @@ public class CurrentTime {
     File reservation;
 
     String userDateTimeInputInFormat;
+    String noshowCarNum;
+    String noshowUserID;
 
     public CurrentTime() {
 
@@ -352,14 +354,14 @@ public class CurrentTime {
                 String line;
                 String[] bookedInfo = getLine.split(" |:|/");
 
+                noshowCarNum = bookedInfo[1];
                 //A-3-1 123-가-1234 2022-7-22/15:00
                 if((Integer.parseInt(standardTimesplit[0])*60+Integer.parseInt(standardTimesplit[1]))-(Integer.parseInt(bookedInfo[3])*60+Integer.parseInt(bookedInfo[4]))>120){
-
+                    addToBlackList();
                     System.out.println(bookedInfo[1]+"차량의 노쇼처리가 완료되었습니다.");
                     continue;
                 }
                 out.println(getLine);
-
             }
             out.flush();
             out.close();
@@ -371,6 +373,72 @@ public class CurrentTime {
 
         }catch(IOException e){
             e.printStackTrace();
+        }
+    }
+
+    private void addToBlackList(){
+        File UserTxt = new File("User.txt");
+        StringBuffer sb1 = new StringBuffer();
+        FileReader readUserFile;
+        String getUserLine;
+        try {
+            if (!UserTxt.exists())
+                UserTxt.createNewFile();
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+        try {
+            readUserFile = new FileReader(UserTxt);
+            BufferedReader br = new BufferedReader(readUserFile);
+
+            while ((getUserLine = br.readLine()) != null) {
+                if ((noshowCarNum != null) && (getUserLine.contains(noshowCarNum))) {
+                    noshowUserID = getUserLine.split(" ")[0];
+                    System.out.println(noshowUserID + "사용자가 블랙리스트에 추가되었습니다.");
+                }
+            }
+            br.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        File blacklistTxt = new File("blacklist.txt");
+
+        try {
+            if (!blacklistTxt.exists())
+                blacklistTxt.createNewFile();
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+        //
+        try
+        {
+            //파일에서 읽은 한라인을 저장하는 임시변수
+            String thisLine = "";
+            // 새 로그가 저장될 임시파일 생성
+            File tmpFile1 = new File("aaaaaaaaaaa.txt");
+            // 기존 파일
+            FileInputStream currentFile = new FileInputStream("blacklist.txt");
+            BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
+            // output 파일
+            FileOutputStream fout = new FileOutputStream(tmpFile1);
+            PrintWriter out = new PrintWriter(fout);
+            //파일 내용을 한라인씩 읽어 삽입될 라인이 오면 문자열을 삽입
+            out.println(noshowUserID);
+            while ((thisLine = in.readLine()) != null) {
+                out.println(thisLine);
+            }
+            out.flush();
+            out.close();
+            fout.close();
+            in.close();
+            blacklistTxt.delete();
+            //임시파일을 원래 파일명으로 변경
+            tmpFile1.renameTo(blacklistTxt);
+
+        } catch (Exception e) {
+            e.getStackTrace();
         }
     }
 }
