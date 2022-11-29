@@ -15,11 +15,7 @@ public class Visit {
     private boolean[][] parkB = new boolean[4][4];
 
     String pathname;
-    int input0;
-    int input1;
-    int input2;
-    int input3;
-    int input4;
+    int input0, input1, input2, input3, input4;
 
     public Visit(String currentTime, String memberId) {
         this.currentTime = currentTime;
@@ -33,7 +29,6 @@ public class Visit {
             System.out.println("주차장 운영 시간이 아닙니다.");
             return;
         }
-
 
         int menu =0;
         boolean flag = true;
@@ -176,10 +171,7 @@ public class Visit {
         }
         return true; //차량이 존재하지 않으면 true 반환
     }
-    //carIn && carOut 공통 구역 끝 =========================
 
-
-    // carIN 구역 =====================================
     public void carIn(){
         //입차
 
@@ -761,7 +753,7 @@ public class Visit {
             BufferedReader in = new BufferedReader(new InputStreamReader(currentFile));
             if(in.readLine() == null)
             {
-                System.out.println("주차장이 모두 비어있습니다. 출차 하실 수 없습니다.");
+                System.out.println("출차할 차량이 없습니다.");
                 System.exit(0);
             }
             in.close();
@@ -820,7 +812,6 @@ public class Visit {
 
 
 }
-// carOut 구역 끝==========================================
 
 
 
