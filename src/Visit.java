@@ -1,3 +1,4 @@
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.io.*;
@@ -150,27 +151,48 @@ public class Visit {
 
             while((getLine = br.readLine()) != null) {
                 //visited.txt  첫줄부터 읽기 시작
-                if(getLine.split(" ").equals("\n")) {
-                    //만약 visited.txt에 공백으로만 된 줄이 있으면 무시하고 다음줄 읽기
-                    //.......로 하는게 목적이었는데 if조건문 안에 뭘 넣어야하는지 모르겠음. 공백줄 없으면 에러는 안남.
-                    // (getLine.replaceFirst(" \n", "") == "") ??
-                    continue;
-                } else {
-                    String[] txtSplit = getLine.split(" "); //공백으로 구분
-                    if(txtSplit[1].contains(carNum)) {
+                String[] txtSplit = getLine.split(" "); //공백으로 구분
+                if(txtSplit[1].contains(carNum)) {
+                    if(readUserId()){
+                        System.out.println(memberId + " 사용자의 " + carNum + "차량은 현재 주차되어있는 차량입니다.");
+                        br.close();
+                        return false;
+                    } else{
                         System.out.println(carNum + "차량은 현재 주차되어있는 차량입니다.");
-                        return false; //차량이 존재하면 false 반환
+                        System.out.println("사용자ID와 차량번호가 일치하지 않습니다.");
+                        br.close();
+                        return true;
                     }
                 }
             }
-            br.close();
-        } catch(FileNotFoundException e) {
-            e.printStackTrace();
         } catch(IOException e) {
             e.printStackTrace();
         }
         return true; //차량이 존재하지 않으면 true 반환
     }
+
+    private boolean readUserId(){
+        File UserTxt = new File("User.txt");
+        FileReader readUserFile;
+        String getUserLine;
+        try {
+            readUserFile = new FileReader(UserTxt);
+            BufferedReader br = new BufferedReader(readUserFile);
+
+            while ((getUserLine = br.readLine()) != null) {
+                if ((getUserLine.contains(carNum)) && (Objects.equals(memberId, getUserLine.split(" ")[0]))) {
+                    br.close();
+                    return true;
+                }
+            }
+            br.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 
     public void carIn(){
         //입차
@@ -784,8 +806,8 @@ public class Visit {
         try{
             File currentTime = new File(split[0] + "/visited.txt");
             File tmpFile = new File(split[0]+ "/$$$$$$$$.txt");
-            FileOutputStream fout = new FileOutputStream(tmpFile);
-            PrintWriter out = new PrintWriter(fout);
+            FileOutputStream fout1 = new FileOutputStream(tmpFile);
+            PrintWriter out = new PrintWriter(fout1);
             FileInputStream currentFile = new FileInputStream(split[0]+ "/visited.txt");
             BufferedReader br = new BufferedReader(new InputStreamReader(currentFile));
 
@@ -799,7 +821,7 @@ public class Visit {
             }
             out.flush();
             out.close();
-            fout.close();
+            fout1.close();
             br.close();
             currentTime.delete();
             //임시파일을 원래 파일명으로 변경

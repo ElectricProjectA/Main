@@ -61,7 +61,7 @@ public class Reservation {
             enterParkingSeat(); //주차를 원하는 자리 입력
             if(inputCarNum()) { //올바른 형식으로 입력했는지 확인
 
-                isNotOk = isAlreadyReserved();
+                isNotOk = isAlreadyReserved() || isAlreadyParked();
                 if(isNotOk) {
                     System.out.println("이미 예약되어있습니다. 다시 입력하세요");
                 }
@@ -242,6 +242,37 @@ public class Reservation {
 
 
 
+    }
+
+    private boolean isAlreadyParked(){
+        String[] split = clearReservationTime.split("/");
+        //currentTime: 생상자로 받아온 현재 날짜와 시각
+        //(입력 예시: 2022-9-28/14:00)
+
+        StringBuffer sb = new StringBuffer();
+        FileReader readFile;
+        String getLine;
+        //File reserveFile = new File(split[0]);
+        try {
+
+            readFile = new FileReader(split[0] + "/visited.txt");
+
+            BufferedReader br = new BufferedReader(readFile);
+            while((getLine = br.readLine()) != null) {
+                //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작
+                String[] txtSplit = getLine.split(" "); //공백으로 구분
+                if(txtSplit[1].contains(carNum)) {
+                    System.out.println(carNum + "차량은 이미 주차되어있는 차량입니다.");
+                    return true; //차량이 존재하면 true 반환
+                }
+            }
+            br.close();
+        } catch(FileNotFoundException e) {
+            e.printStackTrace();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        return false; //차량이 존재하지 않으면 false 반환
     }
 
     private boolean isAlreadyReserved() {
