@@ -127,6 +127,7 @@ public class MemberManagement {
         FileReader readFile;
         String getLine;
         File userTxt = new File("User.txt");
+        boolean isNewCar = true;
         try {
             // 기존 파일
             FileInputStream currentFile = new FileInputStream(userTxt);
@@ -144,6 +145,7 @@ public class MemberManagement {
                     if(getLine.contains(carNum))
                     {
                         System.out.println("이미 회원에 등록된 차량입니다. 환영합니다.");
+                        isNewCar = false;
                         out.println(getLine);
                     }
                     else
@@ -166,6 +168,6 @@ public class MemberManagement {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        return isNewCar;
     }
 }

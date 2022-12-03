@@ -153,7 +153,7 @@ public class Visit {
                 //visited.txt  첫줄부터 읽기 시작
                 String[] txtSplit = getLine.split(" "); //공백으로 구분
                 if(txtSplit[1].contains(carNum)) {
-                    if(readUserId()){
+                    if(isSametoCurrentUserId()){
                         System.out.println(memberId + " 사용자의 " + carNum + "차량은 현재 주차되어있는 차량입니다.");
                         br.close();
                         return false;
@@ -161,7 +161,7 @@ public class Visit {
                         System.out.println(carNum + "차량은 현재 주차되어있는 차량입니다.");
                         System.out.println("사용자ID와 차량번호가 일치하지 않습니다.");
                         br.close();
-                        return true;
+                        return false;
                     }
                 }
             }
@@ -171,7 +171,7 @@ public class Visit {
         return true; //차량이 존재하지 않으면 true 반환
     }
 
-    private boolean readUserId(){
+    private boolean isSametoCurrentUserId(){
         File UserTxt = new File("User.txt");
         FileReader readUserFile;
         String getUserLine;
@@ -210,7 +210,7 @@ public class Visit {
 
         //2. 해당 회원 정보에 등록된 차량인지 확인
         memberManagement = new MemberManagement(memberId);
-        if(!memberManagement.addNewCarToMember(carNum)) {
+        if(memberManagement.addNewCarToMember(carNum)) {
             //신규 차량 등록
             System.out.println("신규 차량을 등록합니다.");
         }

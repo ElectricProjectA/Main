@@ -124,7 +124,7 @@ public class Reservation {
         boolean flag = true;
         while(flag)
         {
-            System.out.print("주차할 자리를 선택하세요 : ");
+            System.out.print("주차할 자리를 선택하세요 ex)A-0-0 :  ");
             Scanner scan = new Scanner(System.in);
             String area = scan.next();
             String[] split = area.split("-");
@@ -222,7 +222,7 @@ public class Reservation {
 
         //사용자가 새로운 차량을 등록하는 경우 사용자 정보(전화번호, 차량번호)를 User.txt에 저장
         memberManagement = new MemberManagement(memberId);
-        if(!memberManagement.addNewCarToMember(carNum)) {
+        if(memberManagement.addNewCarToMember(carNum)) {
             //신규 차량 등록
             System.out.println("신규 차량을 등록합니다.");
         }
@@ -349,7 +349,8 @@ public class Reservation {
             String[] rsvDate = clearReservationTime.split("/")[0].split("-"); // 2022 09 22
             if(rsvDate[1].equals(currentDate[1]) && rsvDate[2].equals(currentDate[2])){
                 BufferedReader brr = new BufferedReader(readVisitedFile);
-                while((getLine = brr.readLine()) != null) {
+                while((getLine = brr.readLine()) != null&&!(getLine).equals(""))
+                {
                     String[] seat = getLine.split(" ")[0].split("-");
                     if(seat[0].equals("A")){
                         parkA[Integer.parseInt(seat[1])][Integer.parseInt(seat[2])] = true;

@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CurrentTime {
@@ -10,7 +11,7 @@ public class CurrentTime {
 
     String userDateTimeInputInFormat;
     String noshowCarNum;
-    String noshowUserID;
+    ArrayList<String> noshowUserID = new ArrayList<>();
 
     public CurrentTime() {
 
@@ -358,7 +359,6 @@ public class CurrentTime {
                 //A-3-1 123-가-1234 2022-7-22/15:00
                 if((Integer.parseInt(standardTimesplit[0])*60+Integer.parseInt(standardTimesplit[1]))-(Integer.parseInt(bookedInfo[3])*60+Integer.parseInt(bookedInfo[4]))>120){
                     addToBlackList();
-                    System.out.println(bookedInfo[1]+"차량의 노쇼처리가 완료되었습니다.");
                     continue;
                 }
                 out.println(getLine);
@@ -390,11 +390,11 @@ public class CurrentTime {
         try {
             readUserFile = new FileReader(UserTxt);
             BufferedReader br = new BufferedReader(readUserFile);
-
+            int k=0;
             while ((getUserLine = br.readLine()) != null) {
                 if ((noshowCarNum != null) && (getUserLine.contains(noshowCarNum))) {
-                    noshowUserID = getUserLine.split(" ")[0];
-                    System.out.println(noshowUserID + "사용자가 블랙리스트에 추가되었습니다.");
+                    noshowUserID.add(getUserLine.split(" ")[0]);
+                    System.out.println(noshowUserID.get(k++) + "사용자가 블랙리스트에 추가되었습니다.");
                 }
             }
             br.close();
@@ -425,7 +425,9 @@ public class CurrentTime {
             FileOutputStream fout = new FileOutputStream(tmpFile1);
             PrintWriter out = new PrintWriter(fout);
             //파일 내용을 한라인씩 읽어 삽입될 라인이 오면 문자열을 삽입
-            out.println(noshowUserID);
+            for (int i = 0; i < noshowUserID.size(); i++) {
+                out.println(noshowUserID.get(i));
+            }
             while ((thisLine = in.readLine()) != null) {
                 out.println(thisLine);
             }
