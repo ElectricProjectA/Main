@@ -259,7 +259,7 @@ public class Reservation {
 
             BufferedReader br = new BufferedReader(readFile);
             while((getLine = br.readLine()) != null) {
-                //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작
+                //주차구역 차량번호 현재시간이 저장된 줄부터 읽기 시작f
                 String[] txtSplit = getLine.split(" "); //공백으로 구분
                 if(txtSplit[1].contains(carNum)) {
                     System.out.println(carNum + "차량은 이미 주차되어있는 차량입니다.");

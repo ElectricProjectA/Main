@@ -234,7 +234,7 @@ public class Visit {
                     deleteReservationAfterReservationCheck();
 
                     if(noEmptySeats()) {
-                        System.out.println("Occupying Visiter has force Exited");
+                        System.out.println("자리를 점유하고 있는 고객은 강제출차되었습니다.");
                     } else {
                         boolean isFindingEmptySpotNotOver = true;
                         while(isFindingEmptySpotNotOver){
@@ -260,6 +260,7 @@ public class Visit {
                                     break;
                                 }
                             }
+                            break;
                         }
                     }
                 }
@@ -349,7 +350,7 @@ public class Visit {
     }
 
     private boolean isReservedUser() {
-        System.out.println("Checking if you've made a reservation...");
+        System.out.println("예약을 했는지 확인하는중입니다...");
 
         boolean isCarReserved = false;
 
@@ -383,7 +384,7 @@ public class Visit {
                 String[] txtSplit = getLine.split(" "); //공백으로 구분
                 if (txtSplit[1].contains(carNum)) {
                     reservedSpot = txtSplit[0];
-                    System.out.println("Your reserved spot is:" + carNum);
+                    System.out.println("고객님의 예약된 자리에 주차될 차량: " + carNum);
                     isCarReserved = true; // returns true if the car has reserved
                 }
             }
@@ -399,7 +400,7 @@ public class Visit {
     }
 
     private boolean isReservedSeatOccupied() {
-        System.out.println("Checking if the spot is occupied...");
+        System.out.println("해당 자리가 이미 예약되었는지 확인하는 중입니다...");
         boolean isReservedSeatOccupied = false;
 
         String[] split = currentTime.split("/");
@@ -434,7 +435,7 @@ public class Visit {
     private void forceExitVisiter() {
         // 예약자리에 입차 차량이 있을때 출차처리함.
 
-        System.out.println("Force exiting occupying visitor...");
+        System.out.println("자리를 점유하고 있는 고객을 강제출차하는 중입니다...");
         String[] split = clearDateTime.split("/");
         String getLine;
         try{
@@ -468,7 +469,7 @@ public class Visit {
 
     private boolean noEmptySeats() {
         // 주차장 loop 돌리기
-        System.out.println("Checking if there are empty seats...");
+        System.out.println("비어있는 자리가 있는지 확인하는 중입니다...");
         boolean isParkinglotFull = true;
 
         String[] input = currentTime.split("-|/|:");
@@ -534,7 +535,7 @@ public class Visit {
     private void deleteReservationAfterReservationCheck() {
         // 원래 미예약 입차 고객이라면 입력을 받는 parkingArea를 예약내역에 있는 주차 자리로 갱신해줌.
 
-        System.out.println("Deleteing you reservation since you just visited...");
+        System.out.println("고객님이 방문하셨으니 예약내용을 삭제하는 중입니다...");
         String[] split = clearDateTime.split("/");
         String getLine;
         try{
@@ -735,20 +736,6 @@ public class Visit {
             }
         }
 
-    }
-
-
-    private boolean isReservedSeatFull()
-    {
-
-        return true;
-    }
-
-    private boolean isReserved(){
-
-        System.out.println("Checking if the spot is reserved");
-        System.out.println("test default is false");
-        return false;
     }
 
     // carIn 구역 끝==========================================
